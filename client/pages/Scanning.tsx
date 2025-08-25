@@ -123,9 +123,8 @@ export default function Scanning() {
   // Calculate metrics
   const totalContexts = vulnerabilityData?.clusterStatuses.length || 0;
   const activeScans = Array.from(scanStatuses.values()).filter(status => status.isScanning).length;
-  const recentlyScanned = Array.from(scanStatuses.values()).filter(status => 
-    status.lastScanned && 
-    new Date().getTime() - status.lastScanned.getTime() < 3600000 // Within last hour
+  const completedScans = Array.from(scanStatuses.values()).filter(status =>
+    status.lastScanned
   ).length;
   const totalImages = vulnerabilityData?.clusterStatuses.reduce(
     (sum, cluster) => sum + cluster.nodes.reduce((nodeSum, node) => nodeSum + node.containerImages.length, 0),
