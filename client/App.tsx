@@ -23,15 +23,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/scan/:scanId" element={<ScanResults />} />
-          <Route
-            path="/kubernetes"
-            element={
-              <PlaceholderPage
-                title="Kubernetes Security Scans"
-                description="Monitor and analyze security vulnerabilities in your Kubernetes clusters, including misconfigurations, RBAC issues, and container security."
-              />
-            }
-          />
+          <Route path="/kubernetes" element={<KubeconfigManagement />} />
           <Route
             path="/docker"
             element={
