@@ -21,6 +21,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/scan/:scanId" element={<ScanResults />} />
           <Route
             path="/kubernetes"
             element={
