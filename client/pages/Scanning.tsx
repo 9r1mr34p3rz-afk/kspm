@@ -229,7 +229,7 @@ export default function Scanning() {
                 Security Scanning
               </h1>
               <p className="carbon-type-body-02 text-text-02">
-                Initiate vulnerability scans across your Kubernetes contexts and monitor scan progress
+                Initiate background vulnerability scans across your Kubernetes contexts
               </p>
               {lastUpdated && (
                 <p className="carbon-type-label-01 text-text-03 flex items-center space-x-1 mt-2">
