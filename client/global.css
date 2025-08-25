@@ -1,97 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700&family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   /**
-   * Tailwind CSS theme
-   * tailwind.config.ts expects the following color variables to be expressed as HSL values.
-   * A different format will require also updating the theme in tailwind.config.ts.
-  */
+   * Carbon Design System color tokens
+   * All values are expressed as HSL for consistent theming
+   */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Global background and surfaces */
+    --background: 0 0% 100%; /* White */
+    --foreground: 0 0% 8.6%; /* Gray 100 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Carbon UI tokens - Light theme */
+    --ui-background: 0 0% 100%; /* #ffffff */
+    --ui-01: 0 0% 95.7%; /* #f4f4f4 */
+    --ui-02: 0 0% 100%; /* #ffffff */
+    --ui-03: 0 0% 87.8%; /* #e0e0e0 */
+    --ui-04: 0 0% 55.3%; /* #8d8d8d */
+    --ui-05: 0 0% 8.6%; /* #161616 */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Carbon interactive tokens */
+    --interactive-01: 217 91% 52%; /* #0f62fe - IBM Blue 60 */
+    --interactive-02: 0 0% 22.4%; /* #393939 - Gray 80 */
+    --interactive-03: 217 91% 52%; /* #0f62fe - IBM Blue 60 */
+    --interactive-04: 217 91% 52%; /* #0f62fe - IBM Blue 60 */
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Carbon text tokens */
+    --text-01: 0 0% 8.6%; /* #161616 - Gray 100 */
+    --text-02: 0 0% 22.4%; /* #393939 - Gray 80 */
+    --text-03: 0 0% 65.9%; /* #a8a8a8 - Gray 50 */
+    --text-04: 0 0% 100%; /* #ffffff - White */
+    --text-05: 0 0% 43.5%; /* #6f6f6f - Gray 60 */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Carbon support tokens */
+    --support-01: 3 84% 49%; /* #da1e28 - Red 60 */
+    --support-02: 142 71% 43%; /* #24a148 - Green 60 */
+    --support-03: 48 89% 53%; /* #f1c21b - Yellow 50 */
+    --support-04: 225 100% 40%; /* #0043ce - Blue 70 */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Carbon field tokens */
+    --field-01: 0 0% 95.7%; /* #f4f4f4 */
+    --field-02: 0 0% 100%; /* #ffffff */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Carbon layer tokens */
+    --layer-01: 0 0% 95.7%; /* #f4f4f4 */
+    --layer-02: 0 0% 100%; /* #ffffff */
+    --layer-03: 0 0% 87.8%; /* #e0e0e0 */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Derived tokens for compatibility */
+    --border: 0 0% 87.8%; /* ui-03 */
+    --input: 0 0% 95.7%; /* field-01 */
+    --ring: 217 91% 52%; /* interactive-01 */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Global background and surfaces - Dark theme */
+    --background: 0 0% 8.6%; /* Gray 100 */
+    --foreground: 0 0% 95.7%; /* Gray 10 */
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    /* Carbon UI tokens - Dark theme */
+    --ui-background: 0 0% 8.6%; /* #161616 */
+    --ui-01: 0 0% 12.5%; /* #262626 - Gray 90 */
+    --ui-02: 0 0% 20.4%; /* #393939 - Gray 80 */
+    --ui-03: 0 0% 26.3%; /* #525252 - Gray 70 */
+    --ui-04: 0 0% 43.5%; /* #6f6f6f - Gray 60 */
+    --ui-05: 0 0% 95.7%; /* #f4f4f4 - Gray 10 */
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    /* Carbon interactive tokens - Dark theme */
+    --interactive-01: 217 91% 69%; /* #78a9ff - IBM Blue 40 */
+    --interactive-02: 0 0% 26.3%; /* #525252 - Gray 70 */
+    --interactive-03: 217 91% 69%; /* #78a9ff - IBM Blue 40 */
+    --interactive-04: 217 91% 69%; /* #78a9ff - IBM Blue 40 */
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Carbon text tokens - Dark theme */
+    --text-01: 0 0% 95.7%; /* #f4f4f4 - Gray 10 */
+    --text-02: 0 0% 79.2%; /* #c6c6c6 - Gray 30 */
+    --text-03: 0 0% 43.5%; /* #6f6f6f - Gray 60 */
+    --text-04: 0 0% 8.6%; /* #161616 - Gray 100 */
+    --text-05: 0 0% 55.3%; /* #8d8d8d - Gray 50 */
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Carbon support tokens - Dark theme */
+    --support-01: 3 84% 68%; /* #fa4d56 - Red 50 */
+    --support-02: 142 71% 60%; /* #42be65 - Green 50 */
+    --support-03: 48 89% 53%; /* #f1c21b - Yellow 50 */
+    --support-04: 217 91% 69%; /* #4589ff - Blue 50 */
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    /* Carbon field tokens - Dark theme */
+    --field-01: 0 0% 20.4%; /* #393939 - Gray 80 */
+    --field-02: 0 0% 26.3%; /* #525252 - Gray 70 */
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Carbon layer tokens - Dark theme */
+    --layer-01: 0 0% 12.5%; /* #262626 - Gray 90 */
+    --layer-02: 0 0% 20.4%; /* #393939 - Gray 80 */
+    --layer-03: 0 0% 26.3%; /* #525252 - Gray 70 */
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Derived tokens for compatibility - Dark theme */
+    --border: 0 0% 26.3%; /* ui-03 */
+    --input: 0 0% 20.4%; /* field-01 */
+    --ring: 217 91% 69%; /* interactive-01 */
   }
 }
 
@@ -101,6 +110,86 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-ui-background text-text-01 font-sans;
+    font-feature-settings: "kern" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Carbon Design System spacing and layout utilities */
+  .carbon-grid {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 1rem;
+    width: 100%;
+    max-width: 99rem; /* 1584px */
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  /* Carbon productive typography scale */
+  .carbon-type-productive-heading-01 {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 600;
+    line-height: 1.125rem; /* 18px */
+    letter-spacing: 0.16px;
+  }
+
+  .carbon-type-productive-heading-02 {
+    font-size: 1rem; /* 16px */
+    font-weight: 600;
+    line-height: 1.375rem; /* 22px */
+    letter-spacing: 0;
+  }
+
+  .carbon-type-productive-heading-03 {
+    font-size: 1.25rem; /* 20px */
+    font-weight: 400;
+    line-height: 1.625rem; /* 26px */
+    letter-spacing: 0;
+  }
+
+  .carbon-type-productive-heading-04 {
+    font-size: 1.75rem; /* 28px */
+    font-weight: 400;
+    line-height: 2.25rem; /* 36px */
+    letter-spacing: 0;
+  }
+
+  .carbon-type-body-01 {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 400;
+    line-height: 1.125rem; /* 18px */
+    letter-spacing: 0.16px;
+  }
+
+  .carbon-type-body-02 {
+    font-size: 1rem; /* 16px */
+    font-weight: 400;
+    line-height: 1.375rem; /* 22px */
+    letter-spacing: 0;
+  }
+
+  .carbon-type-label-01 {
+    font-size: 0.75rem; /* 12px */
+    font-weight: 400;
+    line-height: 1rem; /* 16px */
+    letter-spacing: 0.32px;
+  }
+
+  .carbon-type-code-01 {
+    font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier', monospace;
+    font-size: 0.75rem; /* 12px */
+    font-weight: 400;
+    line-height: 1rem; /* 16px */
+    letter-spacing: 0.32px;
+  }
+
+  .carbon-type-code-02 {
+    font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier', monospace;
+    font-size: 0.875rem; /* 14px */
+    font-weight: 400;
+    line-height: 1.25rem; /* 20px */
+    letter-spacing: 0.32px;
   }
 }
