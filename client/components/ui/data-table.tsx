@@ -5,6 +5,7 @@ interface TableColumn {
   key: string;
   label: string;
   className?: string;
+  render?: (value: any, row: TableRow) => React.ReactNode;
 }
 
 interface TableRow {
