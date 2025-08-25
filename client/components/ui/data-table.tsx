@@ -15,6 +15,7 @@ interface DataTableProps {
   columns: TableColumn[];
   data: TableRow[];
   className?: string;
+  onRowClick?: (row: TableRow, index: number) => void;
 }
 
 function getSeverityIcon(severity: string) {
