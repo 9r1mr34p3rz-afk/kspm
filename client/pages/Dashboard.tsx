@@ -182,13 +182,13 @@ export default function Dashboard() {
                     <p className="carbon-type-label-01 text-text-02">Analyze container vulnerabilities</p>
                   </div>
                 </button>
-                <button className="w-full flex items-center space-x-3 p-3 bg-ui-01 hover:bg-ui-03 rounded transition-colors text-left">
+                <Link to="/kubernetes" className="w-full flex items-center space-x-3 p-3 bg-ui-01 hover:bg-ui-03 rounded transition-colors text-left">
                   <Shield className="h-5 w-5 text-interactive-01" />
                   <div>
-                    <p className="carbon-type-body-01 text-text-01">Scan K8s Cluster</p>
-                    <p className="carbon-type-label-01 text-text-02">Check cluster security posture</p>
+                    <p className="carbon-type-body-01 text-text-01">Manage Kubeconfigs</p>
+                    <p className="carbon-type-label-01 text-text-02">Upload and manage cluster configurations</p>
                   </div>
-                </button>
+                </Link>
                 <button className="w-full flex items-center space-x-3 p-3 bg-ui-01 hover:bg-ui-03 rounded transition-colors text-left">
                   <TrendingUp className="h-5 w-5 text-interactive-01" />
                   <div>
