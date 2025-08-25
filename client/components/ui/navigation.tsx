@@ -7,7 +7,7 @@ import {
   AlertTriangle,
   CheckCircle,
   Server,
-  Search,
+  ScanLine,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
