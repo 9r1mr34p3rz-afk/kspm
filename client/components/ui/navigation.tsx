@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Shield, Container, Activity, Settings, AlertTriangle, CheckCircle } from "lucide-react";
+import { Shield, Container, Activity, Settings, AlertTriangle, CheckCircle, Server } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const navigation = [
