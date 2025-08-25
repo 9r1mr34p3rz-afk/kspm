@@ -9,6 +9,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ScanResults from "./pages/ScanResults";
+import KubeconfigManagement from "./pages/KubeconfigManagement";
 import { PlaceholderPage } from "./pages/PlaceholderPage";
 
 const queryClient = new QueryClient();
