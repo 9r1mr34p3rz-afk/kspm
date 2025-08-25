@@ -29,15 +29,7 @@ const App = () => (
           <Route path="/kubernetes" element={<KubeconfigManagement />} />
           <Route path="/clusters" element={<ClusterDetails />} />
           <Route path="/docker" element={<DockerImages />} />
-          <Route
-            path="/vulnerabilities"
-            element={
-              <PlaceholderPage
-                title="Vulnerability Management"
-                description="Comprehensive view of all security vulnerabilities across your infrastructure with risk prioritization and remediation tracking."
-              />
-            }
-          />
+          <Route path="/vulnerabilities" element={<Vulnerabilities />} />
           <Route
             path="/compliance"
             element={
