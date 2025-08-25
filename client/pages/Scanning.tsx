@@ -185,8 +185,8 @@ export default function Scanning() {
     if (status.lastScanned) {
       const timeDiff = new Date().getTime() - status.lastScanned.getTime();
       const hours = Math.floor(timeDiff / 3600000);
-      const timeAgo = hours < 1 ? "Recently" : `${hours}h ago`;
-      
+      const timeAgo = hours < 1 ? "Completed" : `${hours}h ago`;
+
       return (
         <Badge className="bg-green-500 text-white">
           <CheckCircle className="h-3 w-3 mr-1" />
