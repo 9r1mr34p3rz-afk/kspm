@@ -30,6 +30,7 @@ const App = () => (
           <Route path="/kubernetes" element={<KubeconfigManagement />} />
           <Route path="/clusters" element={<ClusterDetails />} />
           <Route path="/docker" element={<DockerImages />} />
+          <Route path="/scanning" element={<Scanning />} />
           <Route path="/vulnerabilities" element={<Vulnerabilities />} />
           <Route
             path="/compliance"
