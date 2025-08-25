@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: Activity },
-  { name: "Kubernetes Scans", href: "/kubernetes", icon: Container },
+  { name: "Kubernetes Configs", href: "/kubernetes", icon: Container },
   { name: "Docker Images", href: "/docker", icon: Container },
   { name: "Vulnerabilities", href: "/vulnerabilities", icon: AlertTriangle },
   { name: "Compliance", href: "/compliance", icon: CheckCircle },
