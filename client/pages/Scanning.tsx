@@ -115,52 +115,6 @@ export default function Scanning() {
     }
   };
 
-  const pollScanCompletion = (contextName: string) => {
-    const checkInterval = setInterval(async () => {
-      try {
-        // Check if scan is complete by fetching updated data
-        const response = await fetch("http://localhost:8080/api/v1/kubeconfigs/jesus/status");
-        
-        if (response.ok) {
-          const data = await response.json();
-          setVulnerabilityData(data);
-          
-          // Update scan status to complete
-          const newScanStatuses = new Map(scanStatuses);
-          const currentStatus = newScanStatuses.get(contextName);
-          if (currentStatus?.isScanning) {
-            newScanStatuses.set(contextName, {
-              ...currentStatus,
-              isScanning: false,
-              lastScanned: new Date(),
-              error: undefined,
-            });
-            setScanStatuses(newScanStatuses);
-            clearInterval(checkInterval);
-          }
-        }
-      } catch (error) {
-        console.error(`Error polling scan completion for ${contextName}:`, error);
-      }
-    }, 5000); // Poll every 5 seconds
-
-    // Clear interval after 5 minutes to prevent infinite polling
-    setTimeout(() => {
-      clearInterval(checkInterval);
-      
-      // If still scanning after 5 minutes, mark as potentially failed
-      const newScanStatuses = new Map(scanStatuses);
-      const currentStatus = newScanStatuses.get(contextName);
-      if (currentStatus?.isScanning) {
-        newScanStatuses.set(contextName, {
-          ...currentStatus,
-          isScanning: false,
-          error: "Scan timeout - please check manually",
-        });
-        setScanStatuses(newScanStatuses);
-      }
-    }, 300000); // 5 minutes
-  };
 
   useEffect(() => {
     fetchContextData();
