@@ -55,7 +55,7 @@ function getSeverityBadge(severity: string) {
   }
 }
 
-export function DataTable({ columns, data, className }: DataTableProps) {
+export function DataTable({ columns, data, className, onRowClick }: DataTableProps) {
   return (
     <div
       className={cn(
