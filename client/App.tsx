@@ -12,6 +12,7 @@ import ScanResults from "./pages/ScanResults";
 import KubeconfigManagement from "./pages/KubeconfigManagement";
 import ClusterDetails from "./pages/ClusterDetails";
 import DockerImages from "./pages/DockerImages";
+import Scanning from "./pages/Scanning";
 import Vulnerabilities from "./pages/Vulnerabilities";
 import { PlaceholderPage } from "./pages/PlaceholderPage";
 
