@@ -228,9 +228,28 @@ export default function Vulnerabilities() {
       )
     },
     { key: "cve", label: "CVE ID" },
-    { key: "containerName", label: "Container" },
     { key: "image", label: "Image" },
-    { key: "clusterName", label: "Cluster" },
+    {
+      key: "clusters",
+      label: "Affected Clusters",
+      render: (value: Array<{clusterName: string; containerName: string}>) => (
+        <div className="flex flex-wrap gap-1">
+          {value.slice(0, 3).map((cluster, index) => (
+            <span
+              key={index}
+              className="inline-flex items-center px-2 py-1 rounded bg-ui-03 text-text-01 carbon-type-label-01 text-xs"
+            >
+              {cluster.clusterName}
+            </span>
+          ))}
+          {value.length > 3 && (
+            <span className="inline-flex items-center px-2 py-1 rounded bg-ui-04 text-text-01 carbon-type-label-01 text-xs">
+              +{value.length - 3} more
+            </span>
+          )}
+        </div>
+      )
+    },
     {
       key: "solution",
       label: "Solution",
