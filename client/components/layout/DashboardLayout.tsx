@@ -9,9 +9,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-ui-background">
       <Navigation />
-      <main className="carbon-grid py-8">
-        {children}
-      </main>
+      <main className="carbon-grid py-8">{children}</main>
     </div>
   );
 }

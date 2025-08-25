@@ -28,7 +28,7 @@ export function KubeconfigUpload({ onUploadSuccess }: KubeconfigUploadProps) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       setSelectedFile(e.dataTransfer.files[0]);
     }
@@ -42,7 +42,7 @@ export function KubeconfigUpload({ onUploadSuccess }: KubeconfigUploadProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedFile || !name.trim()) {
       setError("Please provide both a kubeconfig file and a name");
       return;
@@ -56,17 +56,20 @@ export function KubeconfigUpload({ onUploadSuccess }: KubeconfigUploadProps) {
       formData.append("kubeconfig", selectedFile);
       formData.append("name", name.trim());
 
-      const response = await fetch("http://localhost:8080/api/v1/validate-kubeconfig", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "http://localhost:8080/api/v1/validate-kubeconfig",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data: KubeconfigValidationResponse = await response.json();
-      
+
       if (data.valid && data.stored) {
         onUploadSuccess(data);
         setName("");
@@ -87,7 +90,7 @@ export function KubeconfigUpload({ onUploadSuccess }: KubeconfigUploadProps) {
       <h3 className="carbon-type-productive-heading-02 text-text-01 mb-4">
         Upload Kubeconfig
       </h3>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Name Input */}
         <div>
@@ -113,7 +116,7 @@ export function KubeconfigUpload({ onUploadSuccess }: KubeconfigUploadProps) {
             className={cn(
               "relative border-2 border-dashed rounded-lg p-6 text-center transition-colors",
               dragActive ? "border-interactive-01 bg-ui-01" : "border-ui-04",
-              "hover:border-interactive-01 hover:bg-ui-01"
+              "hover:border-interactive-01 hover:bg-ui-01",
             )}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
@@ -127,13 +130,15 @@ export function KubeconfigUpload({ onUploadSuccess }: KubeconfigUploadProps) {
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               disabled={isUploading}
             />
-            
+
             <div className="flex flex-col items-center space-y-3">
               {selectedFile ? (
                 <>
                   <FileText className="h-8 w-8 text-interactive-01" />
                   <div>
-                    <p className="carbon-type-body-01 text-text-01">{selectedFile.name}</p>
+                    <p className="carbon-type-body-01 text-text-01">
+                      {selectedFile.name}
+                    </p>
                     <p className="carbon-type-label-01 text-text-02">
                       {(selectedFile.size / 1024).toFixed(1)} KB
                     </p>
@@ -172,7 +177,7 @@ export function KubeconfigUpload({ onUploadSuccess }: KubeconfigUploadProps) {
             "w-full flex items-center justify-center space-x-2 px-4 py-3 rounded carbon-type-body-01 transition-colors",
             isUploading || !selectedFile || !name.trim()
               ? "bg-ui-03 text-text-03 cursor-not-allowed"
-              : "bg-interactive-01 text-white hover:bg-interactive-03"
+              : "bg-interactive-01 text-white hover:bg-interactive-03",
           )}
         >
           {isUploading ? (

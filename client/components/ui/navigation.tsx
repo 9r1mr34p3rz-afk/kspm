@@ -1,5 +1,13 @@
 import { cn } from "@/lib/utils";
-import { Shield, Container, Activity, Settings, AlertTriangle, CheckCircle, Server } from "lucide-react";
+import {
+  Shield,
+  Container,
+  Activity,
+  Settings,
+  AlertTriangle,
+  CheckCircle,
+  Server,
+} from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const navigation = [
@@ -40,7 +48,7 @@ export function Navigation() {
                   "flex items-center space-x-2 px-3 py-2 rounded carbon-type-body-01 transition-colors duration-200",
                   isActive
                     ? "bg-ui-03 text-text-01"
-                    : "text-text-02 hover:bg-ui-01 hover:text-text-01"
+                    : "text-text-02 hover:bg-ui-01 hover:text-text-01",
                 )}
               >
                 <item.icon className="h-4 w-4" />

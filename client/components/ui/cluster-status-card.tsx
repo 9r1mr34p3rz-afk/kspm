@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { 
-  Server, 
-  CheckCircle, 
-  XCircle, 
-  ChevronDown, 
+import {
+  Server,
+  CheckCircle,
+  XCircle,
+  ChevronDown,
   ChevronRight,
   Container,
   Settings,
   Shield,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
 import { ClusterStatus } from "@shared/cluster-status";
 
@@ -18,7 +18,10 @@ interface ClusterStatusCardProps {
   className?: string;
 }
 
-export function ClusterStatusCard({ clusterStatus, className }: ClusterStatusCardProps) {
+export function ClusterStatusCard({
+  clusterStatus,
+  className,
+}: ClusterStatusCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const getStatusColor = (reachable: boolean) => {
@@ -27,10 +30,12 @@ export function ClusterStatusCard({ clusterStatus, className }: ClusterStatusCar
 
   const getStatusBadge = (reachable: boolean) => {
     return (
-      <span className={cn(
-        "inline-flex items-center px-2 py-1 rounded carbon-type-label-01 font-medium",
-        reachable ? "bg-support-02 text-white" : "bg-support-01 text-white"
-      )}>
+      <span
+        className={cn(
+          "inline-flex items-center px-2 py-1 rounded carbon-type-label-01 font-medium",
+          reachable ? "bg-support-02 text-white" : "bg-support-01 text-white",
+        )}
+      >
         {reachable ? "Online" : "Offline"}
       </span>
     );
@@ -44,10 +49,18 @@ export function ClusterStatusCard({ clusterStatus, className }: ClusterStatusCar
     );
   };
 
-  const totalImages = clusterStatus.nodes.reduce((sum, node) => sum + node.containerImages.length, 0);
+  const totalImages = clusterStatus.nodes.reduce(
+    (sum, node) => sum + node.containerImages.length,
+    0,
+  );
 
   return (
-    <div className={cn("bg-layer-01 border border-ui-03 rounded overflow-hidden", className)}>
+    <div
+      className={cn(
+        "bg-layer-01 border border-ui-03 rounded overflow-hidden",
+        className,
+      )}
+    >
       {/* Header */}
       <div className="p-6 border-b border-ui-03">
         <div className="flex items-center justify-between">
@@ -103,9 +116,19 @@ export function ClusterStatusCard({ clusterStatus, className }: ClusterStatusCar
           <div className="text-center">
             <div className="flex justify-center">
               {clusterStatus.reachable ? (
-                <CheckCircle className={cn("h-6 w-6", getStatusColor(clusterStatus.reachable))} />
+                <CheckCircle
+                  className={cn(
+                    "h-6 w-6",
+                    getStatusColor(clusterStatus.reachable),
+                  )}
+                />
               ) : (
-                <XCircle className={cn("h-6 w-6", getStatusColor(clusterStatus.reachable))} />
+                <XCircle
+                  className={cn(
+                    "h-6 w-6",
+                    getStatusColor(clusterStatus.reachable),
+                  )}
+                />
               )}
             </div>
             <p className="carbon-type-label-01 text-text-02">Status</p>
@@ -125,15 +148,21 @@ export function ClusterStatusCard({ clusterStatus, className }: ClusterStatusCar
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="flex items-center space-x-2">
                 {getPermissionIcon(clusterStatus.permissions.canListNodes)}
-                <span className="carbon-type-body-01 text-text-01">List Nodes</span>
+                <span className="carbon-type-body-01 text-text-01">
+                  List Nodes
+                </span>
               </div>
               <div className="flex items-center space-x-2">
                 {getPermissionIcon(clusterStatus.permissions.canListPods)}
-                <span className="carbon-type-body-01 text-text-01">List Pods</span>
+                <span className="carbon-type-body-01 text-text-01">
+                  List Pods
+                </span>
               </div>
               <div className="flex items-center space-x-2">
                 {getPermissionIcon(clusterStatus.permissions.canGetMetrics)}
-                <span className="carbon-type-body-01 text-text-01">Get Metrics</span>
+                <span className="carbon-type-body-01 text-text-01">
+                  Get Metrics
+                </span>
               </div>
             </div>
           </div>
@@ -146,10 +175,15 @@ export function ClusterStatusCard({ clusterStatus, className }: ClusterStatusCar
             </h4>
             <div className="space-y-3">
               {clusterStatus.nodes.map((node, index) => (
-                <div key={index} className="bg-layer-02 border border-ui-03 rounded p-4">
+                <div
+                  key={index}
+                  className="bg-layer-02 border border-ui-03 rounded p-4"
+                >
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <h5 className="carbon-type-body-01 text-text-01 font-medium">{node.name}</h5>
+                      <h5 className="carbon-type-body-01 text-text-01 font-medium">
+                        {node.name}
+                      </h5>
                       <p className="carbon-type-label-01 text-text-02">
                         Kubelet: {node.kubeletVersion}
                       </p>
@@ -158,20 +192,27 @@ export function ClusterStatusCard({ clusterStatus, className }: ClusterStatusCar
                       {node.containerImages.length} images
                     </span>
                   </div>
-                  
+
                   {/* Container Images Preview */}
                   {node.containerImages.length > 0 && (
                     <div className="space-y-2">
-                      <p className="carbon-type-label-01 text-text-02">Container Images:</p>
+                      <p className="carbon-type-label-01 text-text-02">
+                        Container Images:
+                      </p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-32 overflow-y-auto">
-                        {node.containerImages.slice(0, 8).map((image, imgIndex) => (
-                          <div key={imgIndex} className="flex items-center space-x-2 text-xs">
-                            <Container className="h-3 w-3 text-text-03" />
-                            <span className="carbon-type-code-01 text-text-01 truncate">
-                              {image.image}
-                            </span>
-                          </div>
-                        ))}
+                        {node.containerImages
+                          .slice(0, 8)
+                          .map((image, imgIndex) => (
+                            <div
+                              key={imgIndex}
+                              className="flex items-center space-x-2 text-xs"
+                            >
+                              <Container className="h-3 w-3 text-text-03" />
+                              <span className="carbon-type-code-01 text-text-01 truncate">
+                                {image.image}
+                              </span>
+                            </div>
+                          ))}
                         {node.containerImages.length > 8 && (
                           <p className="carbon-type-label-01 text-text-03 italic">
                             +{node.containerImages.length - 8} more images...
@@ -193,11 +234,16 @@ export function ClusterStatusCard({ clusterStatus, className }: ClusterStatusCar
             </h4>
             <div className="bg-layer-02 border border-ui-03 rounded p-3 max-h-32 overflow-y-auto">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {clusterStatus.apiVersions.slice(0, 12).map((version, index) => (
-                  <span key={index} className="carbon-type-code-01 text-text-02 text-xs">
-                    {version}
-                  </span>
-                ))}
+                {clusterStatus.apiVersions
+                  .slice(0, 12)
+                  .map((version, index) => (
+                    <span
+                      key={index}
+                      className="carbon-type-code-01 text-text-02 text-xs"
+                    >
+                      {version}
+                    </span>
+                  ))}
                 {clusterStatus.apiVersions.length > 12 && (
                   <span className="carbon-type-label-01 text-text-03 italic text-xs">
                     +{clusterStatus.apiVersions.length - 12} more...

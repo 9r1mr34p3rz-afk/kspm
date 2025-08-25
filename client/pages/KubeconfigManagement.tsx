@@ -10,9 +10,12 @@ import {
   Settings,
   Upload,
   Eye,
-  FileText
+  FileText,
 } from "lucide-react";
-import { KubeconfigValidationResponse, KubeconfigEntry } from "@shared/kubeconfig";
+import {
+  KubeconfigValidationResponse,
+  KubeconfigEntry,
+} from "@shared/kubeconfig";
 import { Link } from "react-router-dom";
 
 export default function KubeconfigManagement() {
@@ -20,42 +23,43 @@ export default function KubeconfigManagement() {
 
   // Load kubeconfigs from localStorage on component mount
   useEffect(() => {
-    const storedKubeconfigs = localStorage.getItem('kubeconfigs');
+    const storedKubeconfigs = localStorage.getItem("kubeconfigs");
     if (storedKubeconfigs) {
       try {
         const configs = JSON.parse(storedKubeconfigs);
         setKubeconfigs(configs);
       } catch (error) {
-        console.error('Error parsing stored kubeconfigs:', error);
+        console.error("Error parsing stored kubeconfigs:", error);
       }
     }
   }, []);
 
   // Save kubeconfigs to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('kubeconfigs', JSON.stringify(kubeconfigs));
+    localStorage.setItem("kubeconfigs", JSON.stringify(kubeconfigs));
   }, [kubeconfigs]);
 
   const handleUploadSuccess = (response: KubeconfigValidationResponse) => {
     const newKubeconfig: KubeconfigEntry = {
       name: response.name,
       importDate: new Date().toISOString(),
-      status: response.valid ? 'valid' : 'invalid'
+      status: response.valid ? "valid" : "invalid",
     };
 
-    setKubeconfigs(prev => [...prev, newKubeconfig]);
+    setKubeconfigs((prev) => [...prev, newKubeconfig]);
   };
 
   const handleDelete = (name: string) => {
-    setKubeconfigs(prev => prev.filter(k => k.name !== name));
+    setKubeconfigs((prev) => prev.filter((k) => k.name !== name));
   };
-
 
   // Calculate metrics
   const totalConfigs = kubeconfigs.length;
-  const validConfigs = kubeconfigs.filter(k => k.status === 'valid').length;
-  const invalidConfigs = kubeconfigs.filter(k => k.status === 'invalid').length;
-  const recentlyAdded = kubeconfigs.filter(k => {
+  const validConfigs = kubeconfigs.filter((k) => k.status === "valid").length;
+  const invalidConfigs = kubeconfigs.filter(
+    (k) => k.status === "invalid",
+  ).length;
+  const recentlyAdded = kubeconfigs.filter((k) => {
     const importDate = new Date(k.importDate);
     const dayAgo = new Date();
     dayAgo.setDate(dayAgo.getDate() - 1);
@@ -68,29 +72,33 @@ export default function KubeconfigManagement() {
       value: totalConfigs.toString(),
       change: "",
       changeType: "neutral" as const,
-      icon: FileText
+      icon: FileText,
     },
     {
       title: "Valid Configs",
       value: validConfigs.toString(),
-      change: validConfigs > 0 ? `${Math.round((validConfigs/totalConfigs)*100)}%` : "",
+      change:
+        validConfigs > 0
+          ? `${Math.round((validConfigs / totalConfigs) * 100)}%`
+          : "",
       changeType: "positive" as const,
-      icon: CheckCircle
+      icon: CheckCircle,
     },
     {
       title: "Invalid Configs",
       value: invalidConfigs.toString(),
       change: "",
-      changeType: invalidConfigs > 0 ? "negative" as const : "neutral" as const,
-      icon: AlertTriangle
+      changeType:
+        invalidConfigs > 0 ? ("negative" as const) : ("neutral" as const),
+      icon: AlertTriangle,
     },
     {
       title: "Added Today",
       value: recentlyAdded.toString(),
       change: "",
       changeType: "neutral" as const,
-      icon: Upload
-    }
+      icon: Upload,
+    },
   ];
 
   return (
@@ -104,7 +112,8 @@ export default function KubeconfigManagement() {
                 Kubernetes Configuration Management
               </h1>
               <p className="carbon-type-body-02 text-text-02">
-                Upload, validate, and manage kubeconfig files for your Kubernetes clusters
+                Upload, validate, and manage kubeconfig files for your
+                Kubernetes clusters
               </p>
             </div>
             <Link
@@ -195,7 +204,9 @@ export default function KubeconfigManagement() {
                   Best Practices
                 </h4>
                 <ul className="space-y-2 carbon-type-body-01 text-text-02">
-                  <li>• Use descriptive cluster names for easy identification</li>
+                  <li>
+                    • Use descriptive cluster names for easy identification
+                  </li>
                   <li>• Regularly rotate and update kubeconfig credentials</li>
                   <li>• Remove unused cluster configurations</li>
                   <li>• Monitor cluster health through the details page</li>
@@ -209,7 +220,9 @@ export default function KubeconfigManagement() {
                   <li>• Kubeconfig files contain sensitive credentials</li>
                   <li>• Validation ensures proper cluster connectivity</li>
                   <li>• Check cluster details for permission status</li>
-                  <li>• Delete configurations when access is no longer needed</li>
+                  <li>
+                    • Delete configurations when access is no longer needed
+                  </li>
                 </ul>
               </div>
             </div>

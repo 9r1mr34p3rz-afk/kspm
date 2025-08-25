@@ -12,5 +12,5 @@ export interface KubeconfigDeleteResponse {
 export interface KubeconfigEntry {
   name: string;
   importDate: string;
-  status: 'valid' | 'invalid';
+  status: "valid" | "invalid";
 }

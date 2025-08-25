@@ -2,22 +2,27 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { MetricCard } from "@/components/ui/metric-card";
 import { DataTable } from "@/components/ui/data-table";
-import { 
-  Container, 
-  Package, 
+import {
+  Container,
+  Package,
   Search,
   Filter,
   RefreshCw,
   AlertTriangle,
   Info,
-  Server
+  Server,
 } from "lucide-react";
 import { KubeconfigEntry } from "@shared/kubeconfig";
-import { ClusterStatusResponse, DockerImageSummary } from "@shared/cluster-status";
+import {
+  ClusterStatusResponse,
+  DockerImageSummary,
+} from "@shared/cluster-status";
 
 export default function DockerImages() {
   const [dockerImages, setDockerImages] = useState<DockerImageSummary[]>([]);
-  const [filteredImages, setFilteredImages] = useState<DockerImageSummary[]>([]);
+  const [filteredImages, setFilteredImages] = useState<DockerImageSummary[]>(
+    [],
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [registryFilter, setRegistryFilter] = useState("all");
@@ -33,14 +38,15 @@ export default function DockerImages() {
     let filtered = dockerImages;
 
     if (searchTerm) {
-      filtered = filtered.filter(img => 
-        img.image.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        img.name.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (img) =>
+          img.image.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          img.name.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 
     if (registryFilter !== "all") {
-      filtered = filtered.filter(img => {
+      filtered = filtered.filter((img) => {
         const registry = img.image.split("/")[0];
         return registry.includes(registryFilter);
       });
@@ -54,14 +60,14 @@ export default function DockerImages() {
     setError("");
 
     try {
-      const storedKubeconfigs = localStorage.getItem('kubeconfigs');
+      const storedKubeconfigs = localStorage.getItem("kubeconfigs");
       if (!storedKubeconfigs) {
         setDockerImages([]);
         return;
       }
 
       const kubeconfigs: KubeconfigEntry[] = JSON.parse(storedKubeconfigs);
-      const validConfigs = kubeconfigs.filter(k => k.status === 'valid');
+      const validConfigs = kubeconfigs.filter((k) => k.status === "valid");
 
       if (validConfigs.length === 0) {
         setDockerImages([]);
@@ -73,14 +79,16 @@ export default function DockerImages() {
 
       for (const config of validConfigs) {
         try {
-          const response = await fetch(`http://localhost:8080/api/v1/kubeconfigs/${config.name}/status`);
+          const response = await fetch(
+            `http://localhost:8080/api/v1/kubeconfigs/${config.name}/status`,
+          );
           if (response.ok) {
             const data: ClusterStatusResponse = await response.json();
-            
+
             if (data.valid && data.clusterStatuses) {
-              data.clusterStatuses.forEach(cluster => {
-                cluster.nodes.forEach(node => {
-                  node.containerImages.forEach(image => {
+              data.clusterStatuses.forEach((cluster) => {
+                cluster.nodes.forEach((node) => {
+                  node.containerImages.forEach((image) => {
                     const key = image.image;
                     if (imageMap.has(key)) {
                       const existing = imageMap.get(key)!;
@@ -97,7 +105,7 @@ export default function DockerImages() {
                         name: image.name,
                         clusters: [cluster.name],
                         nodes: [node.name],
-                        totalInstances: 1
+                        totalInstances: 1,
                       });
                     }
                   });
@@ -110,32 +118,38 @@ export default function DockerImages() {
         }
       }
 
-      const sortedImages = Array.from(imageMap.values()).sort((a, b) => 
-        b.totalInstances - a.totalInstances
+      const sortedImages = Array.from(imageMap.values()).sort(
+        (a, b) => b.totalInstances - a.totalInstances,
       );
-      
+
       setDockerImages(sortedImages);
     } catch (error) {
-      console.error('Error fetching docker images:', error);
-      setError('Failed to load docker images');
+      console.error("Error fetching docker images:", error);
+      setError("Failed to load docker images");
     } finally {
       setIsLoading(false);
     }
   };
 
   // Get unique registries for filter
-  const registries = Array.from(new Set(
-    dockerImages.map(img => {
-      const parts = img.image.split("/");
-      return parts.length > 1 ? parts[0] : "docker.io";
-    })
-  )).sort();
+  const registries = Array.from(
+    new Set(
+      dockerImages.map((img) => {
+        const parts = img.image.split("/");
+        return parts.length > 1 ? parts[0] : "docker.io";
+      }),
+    ),
+  ).sort();
 
   // Calculate metrics
   const totalImages = dockerImages.length;
-  const totalInstances = dockerImages.reduce((sum, img) => sum + img.totalInstances, 0);
-  const totalClusters = new Set(dockerImages.flatMap(img => img.clusters)).size;
-  const totalNodes = new Set(dockerImages.flatMap(img => img.nodes)).size;
+  const totalInstances = dockerImages.reduce(
+    (sum, img) => sum + img.totalInstances,
+    0,
+  );
+  const totalClusters = new Set(dockerImages.flatMap((img) => img.clusters))
+    .size;
+  const totalNodes = new Set(dockerImages.flatMap((img) => img.nodes)).size;
 
   const metrics = [
     {
@@ -143,29 +157,29 @@ export default function DockerImages() {
       value: totalImages.toString(),
       change: "",
       changeType: "neutral" as const,
-      icon: Package
+      icon: Package,
     },
     {
       title: "Total Instances",
       value: totalInstances.toString(),
       change: "",
       changeType: "neutral" as const,
-      icon: Container
+      icon: Container,
     },
     {
       title: "Across Clusters",
       value: totalClusters.toString(),
       change: "",
       changeType: "neutral" as const,
-      icon: Server
+      icon: Server,
     },
     {
       title: "Across Nodes",
       value: totalNodes.toString(),
       change: "",
       changeType: "neutral" as const,
-      icon: Container
-    }
+      icon: Container,
+    },
   ];
 
   const tableColumns = [
@@ -173,15 +187,15 @@ export default function DockerImages() {
     { key: "name", label: "Container Name" },
     { key: "totalInstances", label: "Instances" },
     { key: "clusters", label: "Clusters" },
-    { key: "nodes", label: "Nodes" }
+    { key: "nodes", label: "Nodes" },
   ];
 
-  const tableData = filteredImages.map(img => ({
+  const tableData = filteredImages.map((img) => ({
     image: img.image,
     name: img.name,
     totalInstances: img.totalInstances,
     clusters: img.clusters.join(", "),
-    nodes: `${img.nodes.length} node${img.nodes.length !== 1 ? 's' : ''}`
+    nodes: `${img.nodes.length} node${img.nodes.length !== 1 ? "s" : ""}`,
   }));
 
   return (
@@ -195,7 +209,8 @@ export default function DockerImages() {
                 Docker Images
               </h1>
               <p className="carbon-type-body-02 text-text-02">
-                Comprehensive view of all container images across your Kubernetes clusters
+                Comprehensive view of all container images across your
+                Kubernetes clusters
               </p>
             </div>
             <button
@@ -203,7 +218,9 @@ export default function DockerImages() {
               disabled={isLoading}
               className="flex items-center space-x-2 px-4 py-2 border border-ui-04 text-text-01 rounded carbon-type-body-01 hover:bg-ui-01 transition-colors"
             >
-              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+              />
               <span>Refresh</span>
             </button>
           </div>
@@ -260,8 +277,10 @@ export default function DockerImages() {
                   className="w-full pl-10 pr-3 py-2 bg-field-01 border border-ui-04 rounded carbon-type-body-01 text-text-01 focus:outline-none focus:ring-2 focus:ring-interactive-01 appearance-none"
                 >
                   <option value="all">All Registries</option>
-                  {registries.map(registry => (
-                    <option key={registry} value={registry}>{registry}</option>
+                  {registries.map((registry) => (
+                    <option key={registry} value={registry}>
+                      {registry}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -306,7 +325,8 @@ export default function DockerImages() {
                   No Docker Images Found
                 </h3>
                 <p className="carbon-type-body-01 text-text-02">
-                  Connect and validate kubeconfig files to view container images.
+                  Connect and validate kubeconfig files to view container
+                  images.
                 </p>
               </div>
             </div>
@@ -336,18 +356,29 @@ export default function DockerImages() {
               Registry Overview
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {registries.map(registry => {
-                const registryImages = dockerImages.filter(img => {
+              {registries.map((registry) => {
+                const registryImages = dockerImages.filter((img) => {
                   const imgRegistry = img.image.split("/")[0];
-                  return imgRegistry === registry || (registry === "docker.io" && !img.image.includes("/"));
+                  return (
+                    imgRegistry === registry ||
+                    (registry === "docker.io" && !img.image.includes("/"))
+                  );
                 });
-                const registryInstances = registryImages.reduce((sum, img) => sum + img.totalInstances, 0);
+                const registryInstances = registryImages.reduce(
+                  (sum, img) => sum + img.totalInstances,
+                  0,
+                );
 
                 return (
-                  <div key={registry} className="bg-layer-02 border border-ui-03 rounded p-4">
+                  <div
+                    key={registry}
+                    className="bg-layer-02 border border-ui-03 rounded p-4"
+                  >
                     <div className="flex items-center space-x-2 mb-2">
                       <Package className="h-4 w-4 text-interactive-01" />
-                      <span className="carbon-type-body-01 text-text-01 font-medium">{registry}</span>
+                      <span className="carbon-type-body-01 text-text-01 font-medium">
+                        {registry}
+                      </span>
                     </div>
                     <div className="space-y-1">
                       <p className="carbon-type-label-01 text-text-02">

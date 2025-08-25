@@ -9,20 +9,26 @@ interface KubeconfigTableProps {
   onDelete: (name: string) => void;
 }
 
-export function KubeconfigTable({ kubeconfigs, onDelete }: KubeconfigTableProps) {
+export function KubeconfigTable({
+  kubeconfigs,
+  onDelete,
+}: KubeconfigTableProps) {
   const [deletingNames, setDeletingNames] = useState<Set<string>>(new Set());
   const [error, setError] = useState("");
 
   const handleDelete = async (name: string) => {
     if (deletingNames.has(name)) return;
 
-    setDeletingNames(prev => new Set(prev).add(name));
+    setDeletingNames((prev) => new Set(prev).add(name));
     setError("");
 
     try {
-      const response = await fetch(`http://localhost:8080/api/v1/kubeconfigs/${name}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:8080/api/v1/kubeconfigs/${name}`,
+        {
+          method: "DELETE",
+        },
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -30,13 +36,13 @@ export function KubeconfigTable({ kubeconfigs, onDelete }: KubeconfigTableProps)
 
       const data: KubeconfigDeleteResponse = await response.json();
       console.log("Delete response:", data);
-      
+
       onDelete(name);
     } catch (error) {
       console.error("Delete error:", error);
       setError(`Failed to delete ${name}. Please try again.`);
     } finally {
-      setDeletingNames(prev => {
+      setDeletingNames((prev) => {
         const newSet = new Set(prev);
         newSet.delete(name);
         return newSet;
@@ -54,12 +60,14 @@ export function KubeconfigTable({ kubeconfigs, onDelete }: KubeconfigTableProps)
 
   const getStatusBadge = (status: string) => {
     return (
-      <span className={cn(
-        "inline-flex items-center px-2 py-1 rounded carbon-type-label-01 font-medium",
-        status === "valid" 
-          ? "bg-support-02 text-white" 
-          : "bg-support-01 text-white"
-      )}>
+      <span
+        className={cn(
+          "inline-flex items-center px-2 py-1 rounded carbon-type-label-01 font-medium",
+          status === "valid"
+            ? "bg-support-02 text-white"
+            : "bg-support-01 text-white",
+        )}
+      >
         {status}
       </span>
     );
@@ -77,7 +85,8 @@ export function KubeconfigTable({ kubeconfigs, onDelete }: KubeconfigTableProps)
               No Kubeconfigs Imported
             </h3>
             <p className="carbon-type-body-01 text-text-02">
-              Upload your first kubeconfig file to get started with cluster management.
+              Upload your first kubeconfig file to get started with cluster
+              management.
             </p>
           </div>
         </div>
@@ -143,7 +152,10 @@ export function KubeconfigTable({ kubeconfigs, onDelete }: KubeconfigTableProps)
                   </div>
                 </td>
                 <td className="px-6 py-4 carbon-type-body-01 text-text-02">
-                  {format(new Date(kubeconfig.importDate), "MMM dd, yyyy 'at' HH:mm")}
+                  {format(
+                    new Date(kubeconfig.importDate),
+                    "MMM dd, yyyy 'at' HH:mm",
+                  )}
                 </td>
                 <td className="px-6 py-4">
                   <button
@@ -153,7 +165,7 @@ export function KubeconfigTable({ kubeconfigs, onDelete }: KubeconfigTableProps)
                       "flex items-center space-x-2 px-3 py-2 rounded carbon-type-body-01 transition-colors",
                       deletingNames.has(kubeconfig.name)
                         ? "bg-ui-03 text-text-03 cursor-not-allowed"
-                        : "bg-support-01 text-white hover:bg-red-600"
+                        : "bg-support-01 text-white hover:bg-red-600",
                     )}
                   >
                     {deletingNames.has(kubeconfig.name) ? (

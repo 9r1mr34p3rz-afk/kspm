@@ -11,7 +11,7 @@ import {
   TrendingUp,
   Clock,
   Search,
-  Server
+  Server,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -22,29 +22,29 @@ export default function Dashboard() {
       value: "1,247",
       change: "+12%",
       changeType: "positive" as const,
-      icon: Activity
+      icon: Activity,
     },
     {
       title: "Critical Vulnerabilities",
       value: "23",
       change: "-8%",
       changeType: "positive" as const,
-      icon: AlertTriangle
+      icon: AlertTriangle,
     },
     {
       title: "Docker Images",
       value: "456",
       change: "+5%",
       changeType: "positive" as const,
-      icon: Container
+      icon: Container,
     },
     {
       title: "K8s Clusters",
       value: "18",
       change: "0%",
       changeType: "neutral" as const,
-      icon: Shield
-    }
+      icon: Shield,
+    },
   ];
 
   const recentScans = [
@@ -54,7 +54,7 @@ export default function Dashboard() {
       status: "Completed",
       severity: "Medium",
       vulnerabilities: "3",
-      lastScan: "2 hours ago"
+      lastScan: "2 hours ago",
     },
     {
       name: "production-cluster",
@@ -62,7 +62,7 @@ export default function Dashboard() {
       status: "Running",
       severity: "High",
       vulnerabilities: "12",
-      lastScan: "Currently scanning"
+      lastScan: "Currently scanning",
     },
     {
       name: "postgres:14",
@@ -70,7 +70,7 @@ export default function Dashboard() {
       status: "Completed",
       severity: "Critical",
       vulnerabilities: "7",
-      lastScan: "4 hours ago"
+      lastScan: "4 hours ago",
     },
     {
       name: "dev-cluster",
@@ -78,7 +78,7 @@ export default function Dashboard() {
       status: "Failed",
       severity: "Low",
       vulnerabilities: "1",
-      lastScan: "6 hours ago"
+      lastScan: "6 hours ago",
     },
     {
       name: "redis:7-alpine",
@@ -86,8 +86,8 @@ export default function Dashboard() {
       status: "Completed",
       severity: "Low",
       vulnerabilities: "0",
-      lastScan: "8 hours ago"
-    }
+      lastScan: "8 hours ago",
+    },
   ];
 
   const tableColumns = [
@@ -96,7 +96,7 @@ export default function Dashboard() {
     { key: "status", label: "Status" },
     { key: "severity", label: "Severity" },
     { key: "vulnerabilities", label: "Vulnerabilities" },
-    { key: "lastScan", label: "Last Scan" }
+    { key: "lastScan", label: "Last Scan" },
   ];
 
   const criticalVulnerabilities = [
@@ -105,22 +105,22 @@ export default function Dashboard() {
       severity: "Critical",
       component: "curl",
       description: "SOCKS5 heap buffer overflow",
-      affected: "nginx:1.21, postgres:14"
+      affected: "nginx:1.21, postgres:14",
     },
     {
       cve: "CVE-2023-4911",
       severity: "High",
       component: "glibc",
       description: "Buffer overflow in ld.so",
-      affected: "production-cluster"
+      affected: "production-cluster",
     },
     {
       cve: "CVE-2023-39325",
       severity: "High",
       component: "golang",
       description: "HTTP/2 rapid reset",
-      affected: "multiple containers"
-    }
+      affected: "multiple containers",
+    },
   ];
 
   const vulnerabilityColumns = [
@@ -128,7 +128,7 @@ export default function Dashboard() {
     { key: "severity", label: "Severity" },
     { key: "component", label: "Component" },
     { key: "description", label: "Description" },
-    { key: "affected", label: "Affected Assets" }
+    { key: "affected", label: "Affected Assets" },
   ];
 
   return (
@@ -140,7 +140,8 @@ export default function Dashboard() {
             Security Dashboard
           </h1>
           <p className="carbon-type-body-02 text-text-02">
-            Monitor and manage security vulnerabilities across your Kubernetes clusters and Docker images
+            Monitor and manage security vulnerabilities across your Kubernetes
+            clusters and Docker images
           </p>
         </div>
 
@@ -177,25 +178,43 @@ export default function Dashboard() {
                 Quick Actions
               </h3>
               <div className="space-y-3">
-                <Link to="/docker" className="w-full flex items-center space-x-3 p-3 bg-ui-01 hover:bg-ui-03 rounded transition-colors text-left">
+                <Link
+                  to="/docker"
+                  className="w-full flex items-center space-x-3 p-3 bg-ui-01 hover:bg-ui-03 rounded transition-colors text-left"
+                >
                   <Container className="h-5 w-5 text-interactive-01" />
                   <div>
-                    <p className="carbon-type-body-01 text-text-01">View Docker Images</p>
-                    <p className="carbon-type-label-01 text-text-02">Browse container images across clusters</p>
+                    <p className="carbon-type-body-01 text-text-01">
+                      View Docker Images
+                    </p>
+                    <p className="carbon-type-label-01 text-text-02">
+                      Browse container images across clusters
+                    </p>
                   </div>
                 </Link>
-                <Link to="/kubernetes" className="w-full flex items-center space-x-3 p-3 bg-ui-01 hover:bg-ui-03 rounded transition-colors text-left">
+                <Link
+                  to="/kubernetes"
+                  className="w-full flex items-center space-x-3 p-3 bg-ui-01 hover:bg-ui-03 rounded transition-colors text-left"
+                >
                   <Shield className="h-5 w-5 text-interactive-01" />
                   <div>
-                    <p className="carbon-type-body-01 text-text-01">Manage Kubeconfigs</p>
-                    <p className="carbon-type-label-01 text-text-02">Upload and manage cluster configurations</p>
+                    <p className="carbon-type-body-01 text-text-01">
+                      Manage Kubeconfigs
+                    </p>
+                    <p className="carbon-type-label-01 text-text-02">
+                      Upload and manage cluster configurations
+                    </p>
                   </div>
                 </Link>
                 <button className="w-full flex items-center space-x-3 p-3 bg-ui-01 hover:bg-ui-03 rounded transition-colors text-left">
                   <TrendingUp className="h-5 w-5 text-interactive-01" />
                   <div>
-                    <p className="carbon-type-body-01 text-text-01">View Trends</p>
-                    <p className="carbon-type-label-01 text-text-02">Security analytics & reports</p>
+                    <p className="carbon-type-body-01 text-text-01">
+                      View Trends
+                    </p>
+                    <p className="carbon-type-label-01 text-text-02">
+                      Security analytics & reports
+                    </p>
                   </div>
                 </button>
               </div>
@@ -210,12 +229,17 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4 text-support-04" />
-                    <span className="carbon-type-body-01 text-text-01">production-cluster</span>
+                    <span className="carbon-type-body-01 text-text-01">
+                      production-cluster
+                    </span>
                   </div>
                   <span className="carbon-type-label-01 text-text-02">67%</span>
                 </div>
                 <div className="w-full bg-ui-03 rounded-full h-2">
-                  <div className="bg-support-04 h-2 rounded-full" style={{ width: '67%' }}></div>
+                  <div
+                    className="bg-support-04 h-2 rounded-full"
+                    style={{ width: "67%" }}
+                  ></div>
                 </div>
               </div>
             </div>
@@ -232,7 +256,10 @@ export default function Dashboard() {
               View all vulnerabilities →
             </button>
           </div>
-          <DataTable columns={vulnerabilityColumns} data={criticalVulnerabilities} />
+          <DataTable
+            columns={vulnerabilityColumns}
+            data={criticalVulnerabilities}
+          />
         </div>
       </div>
     </DashboardLayout>

@@ -35,8 +35,9 @@ function getSeverityIcon(severity: string) {
 }
 
 function getSeverityBadge(severity: string) {
-  const baseClasses = "inline-flex items-center px-2 py-1 rounded carbon-type-label-01 font-medium";
-  
+  const baseClasses =
+    "inline-flex items-center px-2 py-1 rounded carbon-type-label-01 font-medium";
+
   switch (severity?.toLowerCase()) {
     case "critical":
       return `${baseClasses} bg-support-01 text-white`;
@@ -55,7 +56,12 @@ function getSeverityBadge(severity: string) {
 
 export function DataTable({ columns, data, className }: DataTableProps) {
   return (
-    <div className={cn("bg-layer-01 border border-ui-03 rounded overflow-hidden", className)}>
+    <div
+      className={cn(
+        "bg-layer-01 border border-ui-03 rounded overflow-hidden",
+        className,
+      )}
+    >
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-layer-02 border-b border-ui-03">
@@ -65,7 +71,7 @@ export function DataTable({ columns, data, className }: DataTableProps) {
                   key={column.key}
                   className={cn(
                     "px-6 py-4 text-left carbon-type-productive-heading-01 text-text-01",
-                    column.className
+                    column.className,
                   )}
                 >
                   {column.label}
@@ -75,16 +81,13 @@ export function DataTable({ columns, data, className }: DataTableProps) {
           </thead>
           <tbody className="divide-y divide-ui-03">
             {data.map((row, index) => (
-              <tr
-                key={index}
-                className="hover:bg-layer-02 transition-colors"
-              >
+              <tr key={index} className="hover:bg-layer-02 transition-colors">
                 {columns.map((column) => (
                   <td
                     key={column.key}
                     className={cn(
                       "px-6 py-4 carbon-type-body-01 text-text-01",
-                      column.className
+                      column.className,
                     )}
                   >
                     {column.key === "severity" ? (
@@ -95,13 +98,19 @@ export function DataTable({ columns, data, className }: DataTableProps) {
                         </span>
                       </div>
                     ) : column.key === "status" ? (
-                      <span className={cn(
-                        "inline-flex items-center px-2 py-1 rounded carbon-type-label-01 font-medium",
-                        row[column.key] === "Completed" && "bg-support-02 text-white",
-                        row[column.key] === "Running" && "bg-support-04 text-white",
-                        row[column.key] === "Failed" && "bg-support-01 text-white",
-                        row[column.key] === "Pending" && "bg-ui-03 text-text-02"
-                      )}>
+                      <span
+                        className={cn(
+                          "inline-flex items-center px-2 py-1 rounded carbon-type-label-01 font-medium",
+                          row[column.key] === "Completed" &&
+                            "bg-support-02 text-white",
+                          row[column.key] === "Running" &&
+                            "bg-support-04 text-white",
+                          row[column.key] === "Failed" &&
+                            "bg-support-01 text-white",
+                          row[column.key] === "Pending" &&
+                            "bg-ui-03 text-text-02",
+                        )}
+                      >
                         {row[column.key]}
                       </span>
                     ) : (

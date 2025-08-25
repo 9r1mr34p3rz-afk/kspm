@@ -21,7 +21,8 @@ export function PlaceholderPage({ title, description }: PlaceholderPageProps) {
             {description}
           </p>
           <p className="carbon-type-body-01 text-text-03">
-            This page is coming soon. Continue prompting to have this content implemented.
+            This page is coming soon. Continue prompting to have this content
+            implemented.
           </p>
         </div>
       </div>

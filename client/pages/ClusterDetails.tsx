@@ -3,10 +3,10 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { MetricCard } from "@/components/ui/metric-card";
 import { ClusterStatusCard } from "@/components/ui/cluster-status-card";
 import { DataTable } from "@/components/ui/data-table";
-import { 
-  Server, 
-  CheckCircle, 
-  AlertTriangle, 
+import {
+  Server,
+  CheckCircle,
+  AlertTriangle,
   RefreshCw,
   Container,
   Shield,
@@ -18,7 +18,7 @@ import {
   Package,
   Users,
   Settings,
-  Eye
+  Eye,
 } from "lucide-react";
 import { KubeconfigEntry } from "@shared/kubeconfig";
 import { ClusterStatusResponse, ClusterStatus } from "@shared/cluster-status";
@@ -26,7 +26,9 @@ import { Link } from "react-router-dom";
 
 export default function ClusterDetails() {
   const [clusterStatuses, setClusterStatuses] = useState<ClusterStatus[]>([]);
-  const [selectedCluster, setSelectedCluster] = useState<ClusterStatus | null>(null);
+  const [selectedCluster, setSelectedCluster] = useState<ClusterStatus | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -41,14 +43,14 @@ export default function ClusterDetails() {
     setError("");
 
     try {
-      const storedKubeconfigs = localStorage.getItem('kubeconfigs');
+      const storedKubeconfigs = localStorage.getItem("kubeconfigs");
       if (!storedKubeconfigs) {
         setClusterStatuses([]);
         return;
       }
 
       const kubeconfigs: KubeconfigEntry[] = JSON.parse(storedKubeconfigs);
-      const validConfigs = kubeconfigs.filter(k => k.status === 'valid');
+      const validConfigs = kubeconfigs.filter((k) => k.status === "valid");
 
       if (validConfigs.length === 0) {
         setClusterStatuses([]);
@@ -59,7 +61,9 @@ export default function ClusterDetails() {
 
       for (const config of validConfigs) {
         try {
-          const response = await fetch(`http://localhost:8080/api/v1/kubeconfigs/${config.name}/status`);
+          const response = await fetch(
+            `http://localhost:8080/api/v1/kubeconfigs/${config.name}/status`,
+          );
           if (response.ok) {
             const data: ClusterStatusResponse = await response.json();
             if (data.valid && data.clusterStatuses) {
@@ -73,14 +77,14 @@ export default function ClusterDetails() {
 
       setClusterStatuses(statuses);
       setLastUpdated(new Date());
-      
+
       // Auto-select first cluster if none selected
       if (statuses.length > 0 && !selectedCluster) {
         setSelectedCluster(statuses[0]);
       }
     } catch (error) {
-      console.error('Error fetching cluster statuses:', error);
-      setError('Failed to load cluster information');
+      console.error("Error fetching cluster statuses:", error);
+      setError("Failed to load cluster information");
     } finally {
       setIsLoading(false);
     }
@@ -88,10 +92,16 @@ export default function ClusterDetails() {
 
   // Calculate overall metrics
   const totalClusters = clusterStatuses.length;
-  const reachableClusters = clusterStatuses.filter(c => c.reachable).length;
-  const totalNodes = clusterStatuses.reduce((sum, c) => sum + c.nodes.length, 0);
-  const totalImages = clusterStatuses.reduce((sum, c) => 
-    sum + c.nodes.reduce((nodeSum, n) => nodeSum + n.containerImages.length, 0), 0
+  const reachableClusters = clusterStatuses.filter((c) => c.reachable).length;
+  const totalNodes = clusterStatuses.reduce(
+    (sum, c) => sum + c.nodes.length,
+    0,
+  );
+  const totalImages = clusterStatuses.reduce(
+    (sum, c) =>
+      sum +
+      c.nodes.reduce((nodeSum, n) => nodeSum + n.containerImages.length, 0),
+    0,
   );
 
   const overallMetrics = [
@@ -100,76 +110,106 @@ export default function ClusterDetails() {
       value: totalClusters.toString(),
       change: "",
       changeType: "neutral" as const,
-      icon: Server
+      icon: Server,
     },
     {
       title: "Online Clusters",
       value: reachableClusters.toString(),
-      change: reachableClusters === totalClusters ? "100%" : `${Math.round((reachableClusters/totalClusters)*100)}%`,
-      changeType: reachableClusters === totalClusters ? "positive" as const : "neutral" as const,
-      icon: CheckCircle
+      change:
+        reachableClusters === totalClusters
+          ? "100%"
+          : `${Math.round((reachableClusters / totalClusters) * 100)}%`,
+      changeType:
+        reachableClusters === totalClusters
+          ? ("positive" as const)
+          : ("neutral" as const),
+      icon: CheckCircle,
     },
     {
       title: "Total Nodes",
       value: totalNodes.toString(),
       change: "",
       changeType: "neutral" as const,
-      icon: Container
+      icon: Container,
     },
     {
       title: "Container Images",
       value: totalImages.toString(),
       change: "",
       changeType: "neutral" as const,
-      icon: Package
-    }
+      icon: Package,
+    },
   ];
 
   // Selected cluster details
   const getClusterHealth = (cluster: ClusterStatus) => {
-    const hasBasicPerms = cluster.permissions.canListNodes && cluster.permissions.canListPods;
+    const hasBasicPerms =
+      cluster.permissions.canListNodes && cluster.permissions.canListPods;
     const hasMetrics = cluster.permissions.canGetMetrics;
-    
-    if (!cluster.reachable) return { status: "Offline", color: "text-support-01", bgColor: "bg-support-01" };
-    if (hasBasicPerms && hasMetrics) return { status: "Healthy", color: "text-support-02", bgColor: "bg-support-02" };
-    if (hasBasicPerms) return { status: "Limited", color: "text-support-03", bgColor: "bg-support-03" };
-    return { status: "Warning", color: "text-support-01", bgColor: "bg-support-01" };
+
+    if (!cluster.reachable)
+      return {
+        status: "Offline",
+        color: "text-support-01",
+        bgColor: "bg-support-01",
+      };
+    if (hasBasicPerms && hasMetrics)
+      return {
+        status: "Healthy",
+        color: "text-support-02",
+        bgColor: "bg-support-02",
+      };
+    if (hasBasicPerms)
+      return {
+        status: "Limited",
+        color: "text-support-03",
+        bgColor: "bg-support-03",
+      };
+    return {
+      status: "Warning",
+      color: "text-support-01",
+      bgColor: "bg-support-01",
+    };
   };
 
   // Get unique API versions across all clusters
   const getAllApiVersions = () => {
     const allVersions = new Set<string>();
-    clusterStatuses.forEach(cluster => {
-      cluster.apiVersions.forEach(version => allVersions.add(version));
+    clusterStatuses.forEach((cluster) => {
+      cluster.apiVersions.forEach((version) => allVersions.add(version));
     });
     return Array.from(allVersions).sort();
   };
 
   // API versions table data
-  const apiVersionsData = selectedCluster ? selectedCluster.apiVersions.map((version, index) => ({
-    version,
-    category: version.includes('/') ? version.split('/')[0] : 'core',
-    apiVersion: version.includes('/') ? version.split('/')[1] || 'v1' : version,
-    status: 'Available'
-  })) : [];
+  const apiVersionsData = selectedCluster
+    ? selectedCluster.apiVersions.map((version, index) => ({
+        version,
+        category: version.includes("/") ? version.split("/")[0] : "core",
+        apiVersion: version.includes("/")
+          ? version.split("/")[1] || "v1"
+          : version,
+        status: "Available",
+      }))
+    : [];
 
   const apiVersionsColumns = [
     { key: "version", label: "API Version" },
     { key: "category", label: "Category" },
     { key: "apiVersion", label: "Version" },
-    { key: "status", label: "Status" }
+    { key: "status", label: "Status" },
   ];
 
   // Container images for selected cluster
   const getClusterImages = (cluster: ClusterStatus) => {
     const images: any[] = [];
-    cluster.nodes.forEach(node => {
-      node.containerImages.forEach(image => {
+    cluster.nodes.forEach((node) => {
+      node.containerImages.forEach((image) => {
         images.push({
           name: image.name,
           image: image.image,
           node: node.name,
-          registry: image.image.split('/')[0] || 'docker.io'
+          registry: image.image.split("/")[0] || "docker.io",
         });
       });
     });
@@ -180,7 +220,7 @@ export default function ClusterDetails() {
     { key: "name", label: "Container Name" },
     { key: "image", label: "Image" },
     { key: "node", label: "Node" },
-    { key: "registry", label: "Registry" }
+    { key: "registry", label: "Registry" },
   ];
 
   return (
@@ -204,7 +244,7 @@ export default function ClusterDetails() {
               )}
             </div>
             <div className="flex items-center space-x-3">
-              <Link 
+              <Link
                 to="/kubernetes"
                 className="flex items-center space-x-2 px-4 py-2 border border-ui-04 text-text-01 rounded carbon-type-body-01 hover:bg-ui-01 transition-colors"
               >
@@ -216,7 +256,9 @@ export default function ClusterDetails() {
                 disabled={isLoading}
                 className="flex items-center space-x-2 px-4 py-2 bg-interactive-01 text-white rounded carbon-type-body-01 hover:bg-interactive-03 transition-colors"
               >
-                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+                />
                 <span>Refresh Data</span>
               </button>
             </div>
@@ -265,7 +307,7 @@ export default function ClusterDetails() {
                 <p className="carbon-type-body-01 text-text-02 mb-4">
                   Upload and validate kubeconfig files to view cluster details.
                 </p>
-                <Link 
+                <Link
                   to="/kubernetes"
                   className="inline-flex items-center space-x-2 px-4 py-2 bg-interactive-01 text-white rounded carbon-type-body-01 hover:bg-interactive-03 transition-colors"
                 >
@@ -289,13 +331,15 @@ export default function ClusterDetails() {
                   {clusterStatuses.map((cluster, index) => {
                     const health = getClusterHealth(cluster);
                     const isSelected = selectedCluster?.name === cluster.name;
-                    
+
                     return (
                       <button
                         key={index}
                         onClick={() => setSelectedCluster(cluster)}
                         className={`w-full p-4 text-left hover:bg-layer-02 transition-colors ${
-                          isSelected ? 'bg-layer-02 border-r-2 border-interactive-01' : ''
+                          isSelected
+                            ? "bg-layer-02 border-r-2 border-interactive-01"
+                            : ""
                         }`}
                       >
                         <div className="flex items-center justify-between">
@@ -308,11 +352,14 @@ export default function ClusterDetails() {
                                 {cluster.name}
                               </p>
                               <p className="carbon-type-label-01 text-text-02">
-                                {cluster.nodes.length} node{cluster.nodes.length !== 1 ? 's' : ''}
+                                {cluster.nodes.length} node
+                                {cluster.nodes.length !== 1 ? "s" : ""}
                               </p>
                             </div>
                           </div>
-                          <span className={`inline-flex items-center px-2 py-1 rounded carbon-type-label-01 font-medium text-white ${health.bgColor}`}>
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded carbon-type-label-01 font-medium text-white ${health.bgColor}`}
+                          >
                             {health.status}
                           </span>
                         </div>
@@ -340,13 +387,19 @@ export default function ClusterDetails() {
                       </h4>
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <span className="carbon-type-body-01 text-text-02">Overall Status</span>
-                          <span className={`carbon-type-body-01 font-medium ${getClusterHealth(selectedCluster).color}`}>
+                          <span className="carbon-type-body-01 text-text-02">
+                            Overall Status
+                          </span>
+                          <span
+                            className={`carbon-type-body-01 font-medium ${getClusterHealth(selectedCluster).color}`}
+                          >
                             {getClusterHealth(selectedCluster).status}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="carbon-type-body-01 text-text-02">Reachability</span>
+                          <span className="carbon-type-body-01 text-text-02">
+                            Reachability
+                          </span>
                           <div className="flex items-center space-x-2">
                             {selectedCluster.reachable ? (
                               <CheckCircle className="h-4 w-4 text-support-02" />
@@ -354,12 +407,14 @@ export default function ClusterDetails() {
                               <AlertTriangle className="h-4 w-4 text-support-01" />
                             )}
                             <span className="carbon-type-body-01 text-text-01">
-                              {selectedCluster.reachable ? 'Online' : 'Offline'}
+                              {selectedCluster.reachable ? "Online" : "Offline"}
                             </span>
                           </div>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="carbon-type-body-01 text-text-02">Node Access</span>
+                          <span className="carbon-type-body-01 text-text-02">
+                            Node Access
+                          </span>
                           <div className="flex items-center space-x-2">
                             {selectedCluster.permissions.canListNodes ? (
                               <CheckCircle className="h-4 w-4 text-support-02" />
@@ -367,12 +422,16 @@ export default function ClusterDetails() {
                               <AlertTriangle className="h-4 w-4 text-support-01" />
                             )}
                             <span className="carbon-type-body-01 text-text-01">
-                              {selectedCluster.permissions.canListNodes ? 'Enabled' : 'Restricted'}
+                              {selectedCluster.permissions.canListNodes
+                                ? "Enabled"
+                                : "Restricted"}
                             </span>
                           </div>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="carbon-type-body-01 text-text-02">Pod Access</span>
+                          <span className="carbon-type-body-01 text-text-02">
+                            Pod Access
+                          </span>
                           <div className="flex items-center space-x-2">
                             {selectedCluster.permissions.canListPods ? (
                               <CheckCircle className="h-4 w-4 text-support-02" />
@@ -380,12 +439,16 @@ export default function ClusterDetails() {
                               <AlertTriangle className="h-4 w-4 text-support-01" />
                             )}
                             <span className="carbon-type-body-01 text-text-01">
-                              {selectedCluster.permissions.canListPods ? 'Enabled' : 'Restricted'}
+                              {selectedCluster.permissions.canListPods
+                                ? "Enabled"
+                                : "Restricted"}
                             </span>
                           </div>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="carbon-type-body-01 text-text-02">Metrics Access</span>
+                          <span className="carbon-type-body-01 text-text-02">
+                            Metrics Access
+                          </span>
                           <div className="flex items-center space-x-2">
                             {selectedCluster.permissions.canGetMetrics ? (
                               <CheckCircle className="h-4 w-4 text-support-02" />
@@ -393,7 +456,9 @@ export default function ClusterDetails() {
                               <AlertTriangle className="h-4 w-4 text-support-01" />
                             )}
                             <span className="carbon-type-body-01 text-text-01">
-                              {selectedCluster.permissions.canGetMetrics ? 'Enabled' : 'Restricted'}
+                              {selectedCluster.permissions.canGetMetrics
+                                ? "Enabled"
+                                : "Restricted"}
                             </span>
                           </div>
                         </div>
@@ -408,27 +473,38 @@ export default function ClusterDetails() {
                       </h4>
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <span className="carbon-type-body-01 text-text-02">Total Nodes</span>
+                          <span className="carbon-type-body-01 text-text-02">
+                            Total Nodes
+                          </span>
                           <span className="carbon-type-productive-heading-02 text-text-01">
                             {selectedCluster.nodes.length}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="carbon-type-body-01 text-text-02">Container Images</span>
+                          <span className="carbon-type-body-01 text-text-02">
+                            Container Images
+                          </span>
                           <span className="carbon-type-productive-heading-02 text-text-01">
-                            {selectedCluster.nodes.reduce((sum, n) => sum + n.containerImages.length, 0)}
+                            {selectedCluster.nodes.reduce(
+                              (sum, n) => sum + n.containerImages.length,
+                              0,
+                            )}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="carbon-type-body-01 text-text-02">API Versions</span>
+                          <span className="carbon-type-body-01 text-text-02">
+                            API Versions
+                          </span>
                           <span className="carbon-type-productive-heading-02 text-text-01">
                             {selectedCluster.apiVersions.length}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="carbon-type-body-01 text-text-02">Server Endpoint</span>
+                          <span className="carbon-type-body-01 text-text-02">
+                            Server Endpoint
+                          </span>
                           <span className="carbon-type-code-01 text-text-01 text-xs">
-                            {selectedCluster.server.replace('https://', '')}
+                            {selectedCluster.server.replace("https://", "")}
                           </span>
                         </div>
                       </div>
@@ -440,15 +516,22 @@ export default function ClusterDetails() {
                     <h4 className="carbon-type-productive-heading-03 text-text-01 mb-4">
                       API Versions ({selectedCluster.apiVersions.length})
                     </h4>
-                    <DataTable columns={apiVersionsColumns} data={apiVersionsData} />
+                    <DataTable
+                      columns={apiVersionsColumns}
+                      data={apiVersionsData}
+                    />
                   </div>
 
                   {/* Container Images Table */}
                   <div>
                     <h4 className="carbon-type-productive-heading-03 text-text-01 mb-4">
-                      Container Images ({getClusterImages(selectedCluster).length})
+                      Container Images (
+                      {getClusterImages(selectedCluster).length})
                     </h4>
-                    <DataTable columns={clusterImagesColumns} data={getClusterImages(selectedCluster)} />
+                    <DataTable
+                      columns={clusterImagesColumns}
+                      data={getClusterImages(selectedCluster)}
+                    />
                   </div>
                 </>
               ) : (
@@ -462,7 +545,8 @@ export default function ClusterDetails() {
                         Select a Cluster
                       </h3>
                       <p className="carbon-type-body-01 text-text-02">
-                        Choose a cluster from the list to view detailed information.
+                        Choose a cluster from the list to view detailed
+                        information.
                       </p>
                     </div>
                   </div>
