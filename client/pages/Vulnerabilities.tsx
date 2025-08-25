@@ -32,122 +32,53 @@ export default function Vulnerabilities() {
   const [severityFilter, setSeverityFilter] = useState("all");
   const [selectedCluster, setSelectedCluster] = useState("all");
 
-  // Mock data based on the provided JSON
-  const mockVulnerabilityData: VulnerabilityResponse = {
-    valid: true,
-    message: "Kubeconfig is valid and all clusters are reachable",
-    clusterStatuses: [
-      {
-        name: "kind-demo-cluster",
-        server: "https://127.0.0.1:53266",
-        reachable: true,
-        nodes: [
-          {
-            name: "demo-cluster-control-plane",
-            kubeletVersion: "v1.29.2",
-            containerImages: [
-              {
-                name: "nginx",
-                image: "nginx:1.14.2",
-                vulnerabilities: []
-              }
-            ]
-          }
-        ],
-        apiVersions: ["v1", "apps/v1"],
-        permissions: {
-          canListNodes: true,
-          canListPods: true,
-          canGetMetrics: false
-        }
-      },
-      {
-        name: "orbstack",
-        server: "https://127.0.0.1:26443",
-        reachable: true,
-        nodes: [
-          {
-            name: "orbstack",
-            kubeletVersion: "v1.31.6+orb1",
-            containerImages: [
-              {
-                name: "coredns",
-                image: "rancher/mirrored-coredns-coredns:1.10.1",
-                vulnerabilities: [
-                  {
-                    id: "e5f39a58b76834a13d5dd8121ae98831afa11c22614d8786f5b80435372da241",
-                    category: "container_scanning",
-                    message: "CVE-2024-51744 on github.com/golang-jwt/jwt@4.2.0",
-                    description: "Unclear documentation of the error behavior in `ParseWithClaims` can lead to situation where users are potentially not checking errors in the way they should be.",
-                    cve: "CVE-2024-51744",
-                    severity: "Low",
-                    solution: "Upgrade github.com/golang-jwt/jwt@4.2.0 to 4.5.1"
-                  },
-                  {
-                    id: "824c689a7fb53cede6d9c1269aa17fcf0b52fa019b6928036d17a36917f0f4ae",
-                    category: "container_scanning",
-                    message: "CVE-2023-24539 on stdlib@1.20",
-                    description: "Angle brackets (<>) are not considered dangerous characters when inserted into CSS contexts. Templates containing multiple actions separated by a '/' character can result in unexpectedly closing the CSS context and allowing for injection of unexpected HTML, if executed with untrusted input.",
-                    cve: "CVE-2023-24539",
-                    severity: "High",
-                    solution: "Upgrade stdlib@1.20 to 1.20.4"
-                  },
-                  {
-                    id: "e8e2647c0f4f5ea4aeb9705feec0ceaa15cc701f098fdbc1cde82774cbb6f9ce",
-                    category: "container_scanning",
-                    message: "CVE-2025-22871 on stdlib@1.20",
-                    description: "The net/http package improperly accepts a bare LF as a line terminator in chunked data chunk-size lines. This can permit request smuggling if a net/http server is used in conjunction with a server that incorrectly accepts a bare LF as part of a chunk-ext.",
-                    cve: "CVE-2025-22871",
-                    severity: "Critical",
-                    solution: "Upgrade stdlib@1.20 to 1.23.8"
-                  }
-                ]
-              },
-              {
-                name: "local-path-provisioner",
-                image: "rancher/local-path-provisioner:v0.0.31",
-                vulnerabilities: [
-                  {
-                    id: "65ed24915088521f79395cc77e064ee68a7fe7eddc145a5608e00b53f7362b20",
-                    category: "container_scanning",
-                    message: "CVE-2025-22866 on stdlib@1.23.5",
-                    description: "Due to the usage of a variable time instruction in the assembly implementation of an internal function, a small number of bits of secret scalars are leaked on the ppc64le architecture.",
-                    cve: "CVE-2025-22866",
-                    severity: "Medium",
-                    solution: "Upgrade stdlib@1.23.5 to 1.23.6"
-                  },
-                  {
-                    id: "d99c2f5573ad26710437c59cf84ae96630eee87b9bde3a5420bbc9b2479a9095",
-                    category: "container_scanning",
-                    message: "CVE-2025-26519 on alpine/musl@1.2.5-r8",
-                    description: "",
-                    cve: "CVE-2025-26519",
-                    severity: "High",
-                    solution: "Upgrade alpine/musl@1.2.5-r8 to 1.2.5-r9"
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        apiVersions: ["v1", "apps/v1"],
-        permissions: {
-          canListNodes: true,
-          canListPods: true,
-          canGetMetrics: false
-        }
+  const fetchVulnerabilityData = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("http://localhost:8080/api/v1/kubeconfigs/jesus/status");
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    ]
+
+      const data = await response.json();
+
+      // Transform the data to match our expected structure
+      const transformedData: VulnerabilityResponse = {
+        valid: data.valid,
+        message: data.message,
+        clusterStatuses: data.clusterStatuses.map((cluster: any) => ({
+          name: cluster.name,
+          server: cluster.server,
+          reachable: cluster.reachable,
+          nodes: cluster.nodes.map((node: any) => ({
+            name: node.name,
+            kubeletVersion: node.kubeletVersion,
+            containerImages: node.containerImages.map((image: any) => ({
+              name: image.name,
+              image: image.image,
+              vulnerabilities: image.vulnerabilities || []
+            }))
+          })),
+          apiVersions: cluster.apiVersions,
+          permissions: cluster.permissions
+        }))
+      };
+
+      setVulnerabilityData(transformedData);
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error("Error fetching vulnerability data:", error);
+      setError("Failed to fetch vulnerability data from the backend");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    // Simulate loading the data
-    setIsLoading(true);
-    setTimeout(() => {
-      setVulnerabilityData(mockVulnerabilityData);
-      setLastUpdated(new Date());
-      setIsLoading(false);
-    }, 1000);
+    fetchVulnerabilityData();
   }, []);
 
   // Calculate metrics
