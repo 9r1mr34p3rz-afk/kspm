@@ -208,7 +208,7 @@ export default function ScanResults() {
                 <span>Export Report</span>
               </button>
               <button className="flex items-center space-x-2 px-4 py-2 bg-interactive-01 text-white rounded carbon-type-body-01 hover:bg-interactive-03 transition-colors">
-                <Refresh className="h-4 w-4" />
+                <RefreshCw className="h-4 w-4" />
                 <span>Rescan</span>
               </button>
             </div>
