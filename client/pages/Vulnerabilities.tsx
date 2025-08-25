@@ -154,15 +154,15 @@ export default function Vulnerabilities() {
 
   // Filter vulnerabilities
   const filteredVulnerabilities = sortedVulnerabilities.filter(vuln => {
-    const matchesSearch = 
+    const matchesSearch =
       vuln.cve.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vuln.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vuln.containerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vuln.clusters.some(cluster => cluster.containerName.toLowerCase().includes(searchTerm.toLowerCase())) ||
       vuln.image.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesSeverity = severityFilter === "all" || vuln.severity === severityFilter;
-    const matchesCluster = selectedCluster === "all" || vuln.clusterName === selectedCluster;
-    
+    const matchesCluster = selectedCluster === "all" || vuln.clusters.some(cluster => cluster.clusterName === selectedCluster);
+
     return matchesSearch && matchesSeverity && matchesCluster;
   });
 
