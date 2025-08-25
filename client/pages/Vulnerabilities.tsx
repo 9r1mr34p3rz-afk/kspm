@@ -383,6 +383,10 @@ export default function Vulnerabilities() {
                 <DataTable
                   columns={vulnerabilityColumns}
                   data={filteredVulnerabilities}
+                  onRowClick={(row) => {
+                    setSelectedVulnerability(row);
+                    setIsDrawerOpen(true);
+                  }}
                 />
               ) : (
                 <div className="bg-layer-01 border border-ui-03 rounded p-8 text-center">
@@ -406,6 +410,130 @@ export default function Vulnerabilities() {
             </div>
           </>
         )}
+
+        {/* Vulnerability Details Drawer */}
+        <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <SheetContent className="w-[500px] sm:w-[540px]">
+            <SheetHeader className="mb-6">
+              <SheetTitle className="flex items-center space-x-2">
+                <AlertTriangle className="h-5 w-5 text-support-01" />
+                <span>Vulnerability Details</span>
+              </SheetTitle>
+              <SheetDescription>
+                Detailed information about the selected security vulnerability
+              </SheetDescription>
+            </SheetHeader>
+
+            {selectedVulnerability && (
+              <div className="space-y-6">
+                {/* CVE Header */}
+                <div className="bg-layer-02 border border-ui-03 rounded p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="carbon-type-productive-heading-02 text-text-01">
+                      {selectedVulnerability.cve}
+                    </h3>
+                    <Badge className={getSeverityColor(selectedVulnerability.severity)}>
+                      {selectedVulnerability.severity}
+                    </Badge>
+                  </div>
+                  <p className="carbon-type-body-01 text-text-02 mb-3">
+                    {selectedVulnerability.message}
+                  </p>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => window.open(`https://nvd.nist.gov/vuln/detail/${selectedVulnerability.cve}`, '_blank')}
+                      className="flex items-center space-x-2 px-3 py-2 bg-interactive-01 text-white rounded carbon-type-body-01 hover:bg-interactive-03 transition-colors text-sm"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      <span>View in NVD</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Location Information */}
+                <div className="space-y-4">
+                  <h4 className="carbon-type-productive-heading-02 text-text-01">
+                    Location
+                  </h4>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="flex items-center justify-between py-2 border-b border-ui-03">
+                      <span className="carbon-type-body-01 text-text-02">Cluster</span>
+                      <span className="carbon-type-body-01 text-text-01 font-medium">
+                        {selectedVulnerability.clusterName}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b border-ui-03">
+                      <span className="carbon-type-body-01 text-text-02">Container</span>
+                      <span className="carbon-type-body-01 text-text-01 font-medium">
+                        {selectedVulnerability.containerName}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b border-ui-03">
+                      <span className="carbon-type-body-01 text-text-02">Image</span>
+                      <span className="carbon-type-code-01 text-text-01 text-xs break-all">
+                        {selectedVulnerability.image}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <span className="carbon-type-body-01 text-text-02">Category</span>
+                      <span className="carbon-type-body-01 text-text-01 font-medium">
+                        {selectedVulnerability.category}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="space-y-4">
+                  <h4 className="carbon-type-productive-heading-02 text-text-01 flex items-center space-x-2">
+                    <Info className="h-4 w-4" />
+                    <span>Description</span>
+                  </h4>
+                  <div className="bg-layer-02 border border-ui-03 rounded p-4">
+                    <p className="carbon-type-body-01 text-text-01 leading-relaxed">
+                      {selectedVulnerability.description || "No detailed description available for this vulnerability."}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Solution */}
+                <div className="space-y-4">
+                  <h4 className="carbon-type-productive-heading-02 text-text-01">
+                    Remediation
+                  </h4>
+                  <div className="bg-layer-02 border border-ui-03 rounded p-4">
+                    <p className="carbon-type-body-01 text-text-01">
+                      {selectedVulnerability.solution || "No specific solution provided. Please refer to the CVE database for more information."}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Additional Actions */}
+                <div className="space-y-4">
+                  <h4 className="carbon-type-productive-heading-02 text-text-01">
+                    Actions
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => window.open(`https://nvd.nist.gov/vuln/detail/${selectedVulnerability.cve}`, '_blank')}
+                      className="flex items-center space-x-2 px-3 py-2 border border-ui-04 text-text-01 rounded carbon-type-body-01 hover:bg-ui-01 transition-colors text-sm"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      <span>NVD Database</span>
+                    </button>
+                    <button
+                      onClick={() => window.open(`https://cve.mitre.org/cgi-bin/cvename.cgi?name=${selectedVulnerability.cve}`, '_blank')}
+                      className="flex items-center space-x-2 px-3 py-2 border border-ui-04 text-text-01 rounded carbon-type-body-01 hover:bg-ui-01 transition-colors text-sm"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      <span>MITRE CVE</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </SheetContent>
+        </Sheet>
       </div>
     </DashboardLayout>
   );
