@@ -57,7 +57,12 @@ function getSeverityBadge(severity: string) {
   }
 }
 
-export function DataTable({ columns, data, className, onRowClick }: DataTableProps) {
+export function DataTable({
+  columns,
+  data,
+  className,
+  onRowClick,
+}: DataTableProps) {
   return (
     <div
       className={cn(
@@ -88,7 +93,7 @@ export function DataTable({ columns, data, className, onRowClick }: DataTablePro
                 key={index}
                 className={cn(
                   "hover:bg-layer-02 transition-colors",
-                  onRowClick && "cursor-pointer"
+                  onRowClick && "cursor-pointer",
                 )}
                 onClick={() => onRowClick?.(row, index)}
               >

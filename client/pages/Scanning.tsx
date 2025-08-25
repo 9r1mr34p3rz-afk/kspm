@@ -25,8 +25,11 @@ interface ScanStatus {
 }
 
 export default function Scanning() {
-  const [vulnerabilityData, setVulnerabilityData] = useState<VulnerabilityResponse | null>(null);
-  const [scanStatuses, setScanStatuses] = useState<Map<string, ScanStatus>>(new Map());
+  const [vulnerabilityData, setVulnerabilityData] =
+    useState<VulnerabilityResponse | null>(null);
+  const [scanStatuses, setScanStatuses] = useState<Map<string, ScanStatus>>(
+    new Map(),
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -36,12 +39,14 @@ export default function Scanning() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8080/api/v1/kubeconfigs/jesus/status");
-      
+      const response = await fetch(
+        "http://localhost:8080/api/v1/kubeconfigs/jesus/status",
+      );
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setVulnerabilityData(data);
       setLastUpdated(new Date());
@@ -80,11 +85,11 @@ export default function Scanning() {
       const response = await fetch(
         `http://localhost:8080/api/v1/kubeconfigs/jesus/contexts/${contextName}/scan`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -100,7 +105,6 @@ export default function Scanning() {
         error: undefined,
       });
       setScanStatuses(finalScanStatuses);
-
     } catch (error) {
       console.error(`Error starting scan for ${contextName}:`, error);
 
@@ -115,21 +119,28 @@ export default function Scanning() {
     }
   };
 
-
   useEffect(() => {
     fetchContextData();
   }, []);
 
   // Calculate metrics
   const totalContexts = vulnerabilityData?.clusterStatuses.length || 0;
-  const activeScans = Array.from(scanStatuses.values()).filter(status => status.isScanning).length;
-  const completedScans = Array.from(scanStatuses.values()).filter(status =>
-    status.lastScanned
+  const activeScans = Array.from(scanStatuses.values()).filter(
+    (status) => status.isScanning,
   ).length;
-  const totalImages = vulnerabilityData?.clusterStatuses.reduce(
-    (sum, cluster) => sum + cluster.nodes.reduce((nodeSum, node) => nodeSum + node.containerImages.length, 0),
-    0
-  ) || 0;
+  const completedScans = Array.from(scanStatuses.values()).filter(
+    (status) => status.lastScanned,
+  ).length;
+  const totalImages =
+    vulnerabilityData?.clusterStatuses.reduce(
+      (sum, cluster) =>
+        sum +
+        cluster.nodes.reduce(
+          (nodeSum, node) => nodeSum + node.containerImages.length,
+          0,
+        ),
+      0,
+    ) || 0;
 
   const metrics = [
     {
@@ -143,7 +154,8 @@ export default function Scanning() {
       title: "Active Scans",
       value: activeScans.toString(),
       change: activeScans > 0 ? "Scanning in progress" : "Ready to scan",
-      changeType: activeScans > 0 ? ("neutral" as const) : ("positive" as const),
+      changeType:
+        activeScans > 0 ? ("neutral" as const) : ("positive" as const),
       icon: Radar,
     },
     {
@@ -171,7 +183,7 @@ export default function Scanning() {
         </Badge>
       );
     }
-    
+
     if (status.error) {
       return (
         <Badge className="bg-red-500 text-white">
@@ -180,7 +192,7 @@ export default function Scanning() {
         </Badge>
       );
     }
-    
+
     if (status.lastScanned) {
       const timeDiff = new Date().getTime() - status.lastScanned.getTime();
       const hours = Math.floor(timeDiff / 3600000);
@@ -193,7 +205,7 @@ export default function Scanning() {
         </Badge>
       );
     }
-    
+
     return (
       <Badge className="bg-gray-500 text-white">
         <Clock className="h-3 w-3 mr-1" />
@@ -206,7 +218,7 @@ export default function Scanning() {
     if (!vulnerabilityData) return;
 
     // Start scans for all contexts concurrently
-    const scanPromises = vulnerabilityData.clusterStatuses.map(cluster => {
+    const scanPromises = vulnerabilityData.clusterStatuses.map((cluster) => {
       const status = scanStatuses.get(cluster.name);
       if (!status?.isScanning && cluster.reachable) {
         return startScan(cluster.name);
@@ -228,7 +240,8 @@ export default function Scanning() {
                 Security Scanning
               </h1>
               <p className="carbon-type-body-02 text-text-02">
-                Initiate background vulnerability scans across your Kubernetes contexts
+                Initiate background vulnerability scans across your Kubernetes
+                contexts
               </p>
               {lastUpdated && (
                 <p className="carbon-type-label-01 text-text-03 flex items-center space-x-1 mt-2">
@@ -251,7 +264,9 @@ export default function Scanning() {
                 disabled={isLoading}
                 className="flex items-center space-x-2 px-4 py-2 bg-interactive-01 text-white rounded carbon-type-body-01 hover:bg-interactive-03 transition-colors"
               >
-                <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+                <RefreshCw
+                  className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+                />
                 <span>Refresh</span>
               </button>
             </div>
@@ -319,7 +334,7 @@ export default function Scanning() {
                   };
                   const totalImages = cluster.nodes.reduce(
                     (sum, node) => sum + node.containerImages.length,
-                    0
+                    0,
                   );
 
                   return (
@@ -337,7 +352,9 @@ export default function Scanning() {
                               {cluster.name}
                             </h4>
                             <p className="carbon-type-label-01 text-text-02">
-                              {cluster.nodes.length} node{cluster.nodes.length !== 1 ? 's' : ''} • {totalImages} images
+                              {cluster.nodes.length} node
+                              {cluster.nodes.length !== 1 ? "s" : ""} •{" "}
+                              {totalImages} images
                             </p>
                           </div>
                         </div>
@@ -348,18 +365,22 @@ export default function Scanning() {
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-text-02">Server:</span>
                           <span className="text-text-01 font-mono text-xs">
-                            {cluster.server.replace('https://', '')}
+                            {cluster.server.replace("https://", "")}
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-text-02">Status:</span>
-                          <span className={`flex items-center space-x-1 ${cluster.reachable ? 'text-support-02' : 'text-support-01'}`}>
+                          <span
+                            className={`flex items-center space-x-1 ${cluster.reachable ? "text-support-02" : "text-support-01"}`}
+                          >
                             {cluster.reachable ? (
                               <CheckCircle className="h-3 w-3" />
                             ) : (
                               <AlertTriangle className="h-3 w-3" />
                             )}
-                            <span>{cluster.reachable ? 'Online' : 'Offline'}</span>
+                            <span>
+                              {cluster.reachable ? "Online" : "Offline"}
+                            </span>
                           </span>
                         </div>
                       </div>

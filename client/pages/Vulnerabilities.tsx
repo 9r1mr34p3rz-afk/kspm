@@ -21,21 +21,45 @@ import {
   Calendar,
   Info,
 } from "lucide-react";
-import { VulnerabilityResponse, Vulnerability, ContainerImage, ClusterVulnerabilityStatus } from "@shared/api";
+import {
+  VulnerabilityResponse,
+  Vulnerability,
+  ContainerImage,
+  ClusterVulnerabilityStatus,
+} from "@shared/api";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 
 export default function Vulnerabilities() {
-  const [vulnerabilityData, setVulnerabilityData] = useState<VulnerabilityResponse | null>(null);
+  const [vulnerabilityData, setVulnerabilityData] =
+    useState<VulnerabilityResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [severityFilter, setSeverityFilter] = useState("all");
   const [selectedCluster, setSelectedCluster] = useState("all");
-  const [selectedVulnerability, setSelectedVulnerability] = useState<(Vulnerability & { clusters: Array<{clusterName: string; containerName: string}>, image: string }) | null>(null);
+  const [selectedVulnerability, setSelectedVulnerability] = useState<
+    | (Vulnerability & {
+        clusters: Array<{ clusterName: string; containerName: string }>;
+        image: string;
+      })
+    | null
+  >(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const fetchVulnerabilityData = async () => {
@@ -43,7 +67,9 @@ export default function Vulnerabilities() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8080/api/v1/kubeconfigs/jesus/status");
+      const response = await fetch(
+        "http://localhost:8080/api/v1/kubeconfigs/jesus/status",
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -65,12 +91,12 @@ export default function Vulnerabilities() {
             containerImages: node.containerImages.map((image: any) => ({
               name: image.name,
               image: image.image,
-              vulnerabilities: image.vulnerabilities || []
-            }))
+              vulnerabilities: image.vulnerabilities || [],
+            })),
           })),
           apiVersions: cluster.apiVersions,
-          permissions: cluster.permissions
-        }))
+          permissions: cluster.permissions,
+        })),
       };
 
       setVulnerabilityData(transformedData);
@@ -88,40 +114,55 @@ export default function Vulnerabilities() {
   }, []);
 
   // Calculate metrics - deduplicate vulnerabilities and group by clusters
-  const getAllVulnerabilities = (): Array<Vulnerability & { clusters: Array<{clusterName: string; containerName: string}>, image: string }> => {
+  const getAllVulnerabilities = (): Array<
+    Vulnerability & {
+      clusters: Array<{ clusterName: string; containerName: string }>;
+      image: string;
+    }
+  > => {
     if (!vulnerabilityData) return [];
 
-    const vulnMap = new Map<string, Vulnerability & { clusters: Array<{clusterName: string; containerName: string}>, image: string }>();
+    const vulnMap = new Map<
+      string,
+      Vulnerability & {
+        clusters: Array<{ clusterName: string; containerName: string }>;
+        image: string;
+      }
+    >();
 
-    vulnerabilityData.clusterStatuses.forEach(cluster => {
-      cluster.nodes.forEach(node => {
-        node.containerImages.forEach(container => {
+    vulnerabilityData.clusterStatuses.forEach((cluster) => {
+      cluster.nodes.forEach((node) => {
+        node.containerImages.forEach((container) => {
           if (container.vulnerabilities) {
-            container.vulnerabilities.forEach(vuln => {
+            container.vulnerabilities.forEach((vuln) => {
               // Create a unique key for each vulnerability based on CVE + image
               const key = `${vuln.cve}-${container.image}`;
 
               if (vulnMap.has(key)) {
                 // Add cluster info to existing vulnerability
                 const existing = vulnMap.get(key)!;
-                const clusterExists = existing.clusters.some(c =>
-                  c.clusterName === cluster.name && c.containerName === container.name
+                const clusterExists = existing.clusters.some(
+                  (c) =>
+                    c.clusterName === cluster.name &&
+                    c.containerName === container.name,
                 );
                 if (!clusterExists) {
                   existing.clusters.push({
                     clusterName: cluster.name,
-                    containerName: container.name
+                    containerName: container.name,
                   });
                 }
               } else {
                 // Create new vulnerability entry
                 vulnMap.set(key, {
                   ...vuln,
-                  clusters: [{
-                    clusterName: cluster.name,
-                    containerName: container.name
-                  }],
-                  image: container.image
+                  clusters: [
+                    {
+                      clusterName: cluster.name,
+                      containerName: container.name,
+                    },
+                  ],
+                  image: container.image,
                 });
               }
             });
@@ -138,11 +179,16 @@ export default function Vulnerabilities() {
   // Sort vulnerabilities by severity (Critical > High > Medium > Low)
   const getSeverityOrder = (severity: string): number => {
     switch (severity) {
-      case "Critical": return 0;
-      case "High": return 1;
-      case "Medium": return 2;
-      case "Low": return 3;
-      default: return 4;
+      case "Critical":
+        return 0;
+      case "High":
+        return 1;
+      case "Medium":
+        return 2;
+      case "Low":
+        return 3;
+      default:
+        return 4;
     }
   };
 
@@ -153,15 +199,20 @@ export default function Vulnerabilities() {
   });
 
   // Filter vulnerabilities
-  const filteredVulnerabilities = sortedVulnerabilities.filter(vuln => {
+  const filteredVulnerabilities = sortedVulnerabilities.filter((vuln) => {
     const matchesSearch =
       vuln.cve.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vuln.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vuln.clusters.some(cluster => cluster.containerName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      vuln.clusters.some((cluster) =>
+        cluster.containerName.toLowerCase().includes(searchTerm.toLowerCase()),
+      ) ||
       vuln.image.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesSeverity = severityFilter === "all" || vuln.severity === severityFilter;
-    const matchesCluster = selectedCluster === "all" || vuln.clusters.some(cluster => cluster.clusterName === selectedCluster);
+    const matchesSeverity =
+      severityFilter === "all" || vuln.severity === severityFilter;
+    const matchesCluster =
+      selectedCluster === "all" ||
+      vuln.clusters.some((cluster) => cluster.clusterName === selectedCluster);
 
     return matchesSearch && matchesSeverity && matchesCluster;
   });
@@ -181,10 +232,18 @@ export default function Vulnerabilities() {
     }
   };
 
-  const criticalCount = allVulnerabilities.filter(v => v.severity === "Critical").length;
-  const highCount = allVulnerabilities.filter(v => v.severity === "High").length;
-  const mediumCount = allVulnerabilities.filter(v => v.severity === "Medium").length;
-  const lowCount = allVulnerabilities.filter(v => v.severity === "Low").length;
+  const criticalCount = allVulnerabilities.filter(
+    (v) => v.severity === "Critical",
+  ).length;
+  const highCount = allVulnerabilities.filter(
+    (v) => v.severity === "High",
+  ).length;
+  const mediumCount = allVulnerabilities.filter(
+    (v) => v.severity === "Medium",
+  ).length;
+  const lowCount = allVulnerabilities.filter(
+    (v) => v.severity === "Low",
+  ).length;
 
   const metrics = [
     {
@@ -198,12 +257,13 @@ export default function Vulnerabilities() {
       title: "Critical & High",
       value: (criticalCount + highCount).toString(),
       change: criticalCount > 0 ? "Immediate attention required" : "Good",
-      changeType: criticalCount > 0 ? ("negative" as const) : ("positive" as const),
+      changeType:
+        criticalCount > 0 ? ("negative" as const) : ("positive" as const),
       icon: AlertTriangle,
     },
     {
       title: "Affected Images",
-      value: new Set(allVulnerabilities.map(v => v.image)).size.toString(),
+      value: new Set(allVulnerabilities.map((v) => v.image)).size.toString(),
       change: "",
       changeType: "neutral" as const,
       icon: Package,
@@ -222,17 +282,17 @@ export default function Vulnerabilities() {
       key: "severity",
       label: "Severity",
       render: (value: string) => (
-        <Badge className={getSeverityColor(value)}>
-          {value}
-        </Badge>
-      )
+        <Badge className={getSeverityColor(value)}>{value}</Badge>
+      ),
     },
     { key: "cve", label: "CVE ID" },
     { key: "image", label: "Image" },
     {
       key: "clusters",
       label: "Affected Clusters",
-      render: (value: Array<{clusterName: string; containerName: string}>) => (
+      render: (
+        value: Array<{ clusterName: string; containerName: string }>,
+      ) => (
         <div className="flex flex-wrap gap-1">
           {value.slice(0, 3).map((cluster, index) => (
             <span
@@ -248,7 +308,7 @@ export default function Vulnerabilities() {
             </span>
           )}
         </div>
-      )
+      ),
     },
     {
       key: "solution",
@@ -257,8 +317,8 @@ export default function Vulnerabilities() {
         <span className="text-sm text-text-02">
           {value || "No solution available"}
         </span>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -272,7 +332,8 @@ export default function Vulnerabilities() {
                 Vulnerability Management
               </h1>
               <p className="carbon-type-body-02 text-text-02">
-                Comprehensive view of all security vulnerabilities across your infrastructure with risk prioritization and remediation tracking
+                Comprehensive view of all security vulnerabilities across your
+                infrastructure with risk prioritization and remediation tracking
               </p>
               {lastUpdated && (
                 <p className="carbon-type-label-01 text-text-03 flex items-center space-x-1 mt-2">
@@ -297,7 +358,9 @@ export default function Vulnerabilities() {
                 disabled={isLoading}
                 className="flex items-center space-x-2 px-4 py-2 bg-interactive-01 text-white rounded carbon-type-body-01 hover:bg-interactive-03 transition-colors"
               >
-                <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+                <RefreshCw
+                  className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+                />
                 <span>Refresh Scan</span>
               </button>
             </div>
@@ -327,19 +390,29 @@ export default function Vulnerabilities() {
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-red-500 mb-1">{criticalCount}</div>
-                <div className="carbon-type-label-01 text-text-02">Critical</div>
+                <div className="text-2xl font-bold text-red-500 mb-1">
+                  {criticalCount}
+                </div>
+                <div className="carbon-type-label-01 text-text-02">
+                  Critical
+                </div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-500 mb-1">{highCount}</div>
+                <div className="text-2xl font-bold text-orange-500 mb-1">
+                  {highCount}
+                </div>
                 <div className="carbon-type-label-01 text-text-02">High</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-500 mb-1">{mediumCount}</div>
+                <div className="text-2xl font-bold text-yellow-500 mb-1">
+                  {mediumCount}
+                </div>
                 <div className="carbon-type-label-01 text-text-02">Medium</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-500 mb-1">{lowCount}</div>
+                <div className="text-2xl font-bold text-blue-500 mb-1">
+                  {lowCount}
+                </div>
                 <div className="carbon-type-label-01 text-text-02">Low</div>
               </div>
             </div>
@@ -377,7 +450,10 @@ export default function Vulnerabilities() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Filter className="h-4 w-4 text-text-02" />
-                    <Select value={severityFilter} onValueChange={setSeverityFilter}>
+                    <Select
+                      value={severityFilter}
+                      onValueChange={setSeverityFilter}
+                    >
                       <SelectTrigger className="w-32">
                         <SelectValue />
                       </SelectTrigger>
@@ -392,13 +468,16 @@ export default function Vulnerabilities() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Server className="h-4 w-4 text-text-02" />
-                    <Select value={selectedCluster} onValueChange={setSelectedCluster}>
+                    <Select
+                      value={selectedCluster}
+                      onValueChange={setSelectedCluster}
+                    >
                       <SelectTrigger className="w-40">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Clusters</SelectItem>
-                        {vulnerabilityData?.clusterStatuses.map(cluster => (
+                        {vulnerabilityData?.clusterStatuses.map((cluster) => (
                           <SelectItem key={cluster.name} value={cluster.name}>
                             {cluster.name}
                           </SelectItem>
@@ -407,7 +486,8 @@ export default function Vulnerabilities() {
                     </Select>
                   </div>
                   <div className="text-sm text-text-02">
-                    Showing {filteredVulnerabilities.length} of {allVulnerabilities.length} vulnerabilities
+                    Showing {filteredVulnerabilities.length} of{" "}
+                    {allVulnerabilities.length} vulnerabilities
                   </div>
                 </div>
               </div>
@@ -438,7 +518,9 @@ export default function Vulnerabilities() {
                         No Vulnerabilities Found
                       </h3>
                       <p className="carbon-type-body-01 text-text-02">
-                        {searchTerm || severityFilter !== "all" || selectedCluster !== "all"
+                        {searchTerm ||
+                        severityFilter !== "all" ||
+                        selectedCluster !== "all"
                           ? "No vulnerabilities match your current filters."
                           : "Great! No vulnerabilities were detected in your container images."}
                       </p>
@@ -471,7 +553,11 @@ export default function Vulnerabilities() {
                     <h3 className="carbon-type-productive-heading-02 text-text-01">
                       {selectedVulnerability.cve}
                     </h3>
-                    <Badge className={getSeverityColor(selectedVulnerability.severity)}>
+                    <Badge
+                      className={getSeverityColor(
+                        selectedVulnerability.severity,
+                      )}
+                    >
                       {selectedVulnerability.severity}
                     </Badge>
                   </div>
@@ -480,7 +566,12 @@ export default function Vulnerabilities() {
                   </p>
                   <div className="flex items-center space-x-2">
                     <button
-                      onClick={() => window.open(`https://nvd.nist.gov/vuln/detail/${selectedVulnerability.cve}`, '_blank')}
+                      onClick={() =>
+                        window.open(
+                          `https://nvd.nist.gov/vuln/detail/${selectedVulnerability.cve}`,
+                          "_blank",
+                        )
+                      }
                       className="flex items-center space-x-2 px-3 py-2 bg-interactive-01 text-white rounded carbon-type-body-01 hover:bg-interactive-03 transition-colors text-sm"
                     >
                       <ExternalLink className="h-4 w-4" />
@@ -496,13 +587,17 @@ export default function Vulnerabilities() {
                   </h4>
                   <div className="grid grid-cols-1 gap-4">
                     <div className="flex items-center justify-between py-2 border-b border-ui-03">
-                      <span className="carbon-type-body-01 text-text-02">Image</span>
+                      <span className="carbon-type-body-01 text-text-02">
+                        Image
+                      </span>
                       <span className="carbon-type-code-01 text-text-01 text-xs break-all">
                         {selectedVulnerability.image}
                       </span>
                     </div>
                     <div className="flex items-center justify-between py-2 border-b border-ui-03">
-                      <span className="carbon-type-body-01 text-text-02">Category</span>
+                      <span className="carbon-type-body-01 text-text-02">
+                        Category
+                      </span>
                       <span className="carbon-type-body-01 text-text-01 font-medium">
                         {selectedVulnerability.category}
                       </span>
@@ -512,26 +607,28 @@ export default function Vulnerabilities() {
                         Clusters ({selectedVulnerability.clusters.length})
                       </span>
                       <div className="space-y-2">
-                        {selectedVulnerability.clusters.map((cluster, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between p-3 bg-layer-02 border border-ui-03 rounded"
-                          >
-                            <div className="flex items-center space-x-3">
-                              <div className="flex h-6 w-6 items-center justify-center rounded bg-interactive-01">
-                                <Server className="h-3 w-3 text-white" />
-                              </div>
-                              <div>
-                                <span className="carbon-type-body-01 text-text-01 font-medium">
-                                  {cluster.clusterName}
-                                </span>
-                                <div className="carbon-type-label-01 text-text-02">
-                                  Container: {cluster.containerName}
+                        {selectedVulnerability.clusters.map(
+                          (cluster, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center justify-between p-3 bg-layer-02 border border-ui-03 rounded"
+                            >
+                              <div className="flex items-center space-x-3">
+                                <div className="flex h-6 w-6 items-center justify-center rounded bg-interactive-01">
+                                  <Server className="h-3 w-3 text-white" />
+                                </div>
+                                <div>
+                                  <span className="carbon-type-body-01 text-text-01 font-medium">
+                                    {cluster.clusterName}
+                                  </span>
+                                  <div className="carbon-type-label-01 text-text-02">
+                                    Container: {cluster.containerName}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ),
+                        )}
                       </div>
                     </div>
                   </div>
@@ -545,7 +642,8 @@ export default function Vulnerabilities() {
                   </h4>
                   <div className="bg-layer-02 border border-ui-03 rounded p-4">
                     <p className="carbon-type-body-01 text-text-01 leading-relaxed">
-                      {selectedVulnerability.description || "No detailed description available for this vulnerability."}
+                      {selectedVulnerability.description ||
+                        "No detailed description available for this vulnerability."}
                     </p>
                   </div>
                 </div>
@@ -557,7 +655,8 @@ export default function Vulnerabilities() {
                   </h4>
                   <div className="bg-layer-02 border border-ui-03 rounded p-4">
                     <p className="carbon-type-body-01 text-text-01">
-                      {selectedVulnerability.solution || "No specific solution provided. Please refer to the CVE database for more information."}
+                      {selectedVulnerability.solution ||
+                        "No specific solution provided. Please refer to the CVE database for more information."}
                     </p>
                   </div>
                 </div>
@@ -569,14 +668,24 @@ export default function Vulnerabilities() {
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     <button
-                      onClick={() => window.open(`https://nvd.nist.gov/vuln/detail/${selectedVulnerability.cve}`, '_blank')}
+                      onClick={() =>
+                        window.open(
+                          `https://nvd.nist.gov/vuln/detail/${selectedVulnerability.cve}`,
+                          "_blank",
+                        )
+                      }
                       className="flex items-center space-x-2 px-3 py-2 border border-ui-04 text-text-01 rounded carbon-type-body-01 hover:bg-ui-01 transition-colors text-sm"
                     >
                       <ExternalLink className="h-4 w-4" />
                       <span>NVD Database</span>
                     </button>
                     <button
-                      onClick={() => window.open(`https://cve.mitre.org/cgi-bin/cvename.cgi?name=${selectedVulnerability.cve}`, '_blank')}
+                      onClick={() =>
+                        window.open(
+                          `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${selectedVulnerability.cve}`,
+                          "_blank",
+                        )
+                      }
                       className="flex items-center space-x-2 px-3 py-2 border border-ui-04 text-text-01 rounded carbon-type-body-01 hover:bg-ui-01 transition-colors text-sm"
                     >
                       <ExternalLink className="h-4 w-4" />
