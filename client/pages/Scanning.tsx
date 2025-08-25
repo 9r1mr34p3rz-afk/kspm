@@ -91,11 +91,19 @@ export default function Scanning() {
         throw new Error(`Scan request failed: ${response.status}`);
       }
 
-      // Start polling for completion (since it's a background process)
-      pollScanCompletion(contextName);
+      // Mark scan as completed when server responds
+      const finalScanStatuses = new Map(scanStatuses);
+      finalScanStatuses.set(contextName, {
+        ...finalScanStatuses.get(contextName)!,
+        isScanning: false,
+        lastScanned: new Date(),
+        error: undefined,
+      });
+      setScanStatuses(finalScanStatuses);
+
     } catch (error) {
       console.error(`Error starting scan for ${contextName}:`, error);
-      
+
       // Update scan status to show error
       const newScanStatuses = new Map(scanStatuses);
       newScanStatuses.set(contextName, {
