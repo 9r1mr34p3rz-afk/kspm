@@ -198,8 +198,8 @@ export default function Vulnerabilities() {
   ];
 
   const vulnerabilityColumns = [
-    { 
-      key: "severity", 
+    {
+      key: "severity",
       label: "Severity",
       render: (value: string) => (
         <Badge className={getSeverityColor(value)}>
@@ -211,28 +211,13 @@ export default function Vulnerabilities() {
     { key: "containerName", label: "Container" },
     { key: "image", label: "Image" },
     { key: "clusterName", label: "Cluster" },
-    { 
-      key: "solution", 
+    {
+      key: "solution",
       label: "Solution",
       render: (value: string) => (
         <span className="text-sm text-text-02">
           {value || "No solution available"}
         </span>
-      )
-    },
-    {
-      key: "actions",
-      label: "Actions",
-      render: (value: any, row: any) => (
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => window.open(`https://nvd.nist.gov/vuln/detail/${row.cve}`, '_blank')}
-            className="p-1 hover:bg-ui-02 rounded transition-colors"
-            title="View CVE Details"
-          >
-            <ExternalLink className="h-4 w-4 text-text-02" />
-          </button>
-        </div>
       )
     }
   ];
