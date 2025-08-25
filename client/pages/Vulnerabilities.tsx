@@ -35,7 +35,7 @@ export default function Vulnerabilities() {
   const [searchTerm, setSearchTerm] = useState("");
   const [severityFilter, setSeverityFilter] = useState("all");
   const [selectedCluster, setSelectedCluster] = useState("all");
-  const [selectedVulnerability, setSelectedVulnerability] = useState<(Vulnerability & { clusterName: string; containerName: string; image: string }) | null>(null);
+  const [selectedVulnerability, setSelectedVulnerability] = useState<(Vulnerability & { clusters: Array<{clusterName: string; containerName: string}>, image: string }) | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const fetchVulnerabilityData = async () => {
