@@ -246,14 +246,7 @@ export default function Vulnerabilities() {
                 <span>Export Report</span>
               </button>
               <button
-                onClick={() => {
-                  setIsLoading(true);
-                  setTimeout(() => {
-                    setVulnerabilityData(mockVulnerabilityData);
-                    setLastUpdated(new Date());
-                    setIsLoading(false);
-                  }, 1000);
-                }}
+                onClick={fetchVulnerabilityData}
                 disabled={isLoading}
                 className="flex items-center space-x-2 px-4 py-2 bg-interactive-01 text-white rounded carbon-type-body-01 hover:bg-interactive-03 transition-colors"
               >
