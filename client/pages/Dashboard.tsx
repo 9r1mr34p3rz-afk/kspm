@@ -176,13 +176,13 @@ export default function Dashboard() {
                 Quick Actions
               </h3>
               <div className="space-y-3">
-                <button className="w-full flex items-center space-x-3 p-3 bg-ui-01 hover:bg-ui-03 rounded transition-colors text-left">
+                <Link to="/docker" className="w-full flex items-center space-x-3 p-3 bg-ui-01 hover:bg-ui-03 rounded transition-colors text-left">
                   <Container className="h-5 w-5 text-interactive-01" />
                   <div>
-                    <p className="carbon-type-body-01 text-text-01">Scan Docker Image</p>
-                    <p className="carbon-type-label-01 text-text-02">Analyze container vulnerabilities</p>
+                    <p className="carbon-type-body-01 text-text-01">View Docker Images</p>
+                    <p className="carbon-type-label-01 text-text-02">Browse container images across clusters</p>
                   </div>
-                </button>
+                </Link>
                 <Link to="/kubernetes" className="w-full flex items-center space-x-3 p-3 bg-ui-01 hover:bg-ui-03 rounded transition-colors text-left">
                   <Shield className="h-5 w-5 text-interactive-01" />
                   <div>
