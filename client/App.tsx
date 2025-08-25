@@ -26,6 +26,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/scan/:scanId" element={<ScanResults />} />
           <Route path="/kubernetes" element={<KubeconfigManagement />} />
+          <Route path="/clusters" element={<ClusterDetails />} />
           <Route path="/docker" element={<DockerImages />} />
           <Route
             path="/vulnerabilities"
