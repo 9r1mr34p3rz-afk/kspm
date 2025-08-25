@@ -17,11 +17,15 @@ import {
   Download,
   Eye,
   ExternalLink,
+  X,
+  Calendar,
+  Info,
 } from "lucide-react";
 import { VulnerabilityResponse, Vulnerability, ContainerImage, ClusterVulnerabilityStatus } from "@shared/api";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
 export default function Vulnerabilities() {
   const [vulnerabilityData, setVulnerabilityData] = useState<VulnerabilityResponse | null>(null);
