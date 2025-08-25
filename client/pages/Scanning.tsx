@@ -147,11 +147,11 @@ export default function Scanning() {
       icon: Radar,
     },
     {
-      title: "Recently Scanned",
-      value: recentlyScanned.toString(),
-      change: "Last hour",
+      title: "Completed Scans",
+      value: completedScans.toString(),
+      change: "Total scanned",
       changeType: "neutral" as const,
-      icon: Clock,
+      icon: CheckCircle,
     },
     {
       title: "Total Images",
