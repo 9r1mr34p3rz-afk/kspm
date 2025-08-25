@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 const navigation = [
   { name: "Dashboard", href: "/", icon: Activity },
   { name: "Kubernetes", href: "/kubernetes", icon: Shield },
-  { name: "Clusters", href: "/clusters", icon: Container },
+  { name: "Clusters", href: "/clusters", icon: Server },
   { name: "Docker Images", href: "/docker", icon: Container },
   { name: "Vulnerabilities", href: "/vulnerabilities", icon: AlertTriangle },
   { name: "Compliance", href: "/compliance", icon: CheckCircle },
