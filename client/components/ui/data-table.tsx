@@ -82,7 +82,14 @@ export function DataTable({ columns, data, className, onRowClick }: DataTablePro
           </thead>
           <tbody className="divide-y divide-ui-03">
             {data.map((row, index) => (
-              <tr key={index} className="hover:bg-layer-02 transition-colors">
+              <tr
+                key={index}
+                className={cn(
+                  "hover:bg-layer-02 transition-colors",
+                  onRowClick && "cursor-pointer"
+                )}
+                onClick={() => onRowClick?.(row, index)}
+              >
                 {columns.map((column) => (
                   <td
                     key={column.key}
