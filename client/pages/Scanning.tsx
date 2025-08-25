@@ -205,15 +205,17 @@ export default function Scanning() {
 
   const startAllScans = async () => {
     if (!vulnerabilityData) return;
-    
-    for (const cluster of vulnerabilityData.clusterStatuses) {
+
+    // Start scans for all contexts concurrently
+    const scanPromises = vulnerabilityData.clusterStatuses.map(cluster => {
       const status = scanStatuses.get(cluster.name);
-      if (!status?.isScanning) {
-        await startScan(cluster.name);
-        // Small delay between starting scans to avoid overwhelming the backend
-        await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!status?.isScanning && cluster.reachable) {
+        return startScan(cluster.name);
       }
-    }
+      return Promise.resolve();
+    });
+
+    await Promise.all(scanPromises);
   };
 
   return (
