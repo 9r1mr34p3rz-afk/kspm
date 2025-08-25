@@ -492,32 +492,47 @@ export default function Vulnerabilities() {
                 {/* Location Information */}
                 <div className="space-y-4">
                   <h4 className="carbon-type-productive-heading-02 text-text-01">
-                    Location
+                    Affected Locations
                   </h4>
                   <div className="grid grid-cols-1 gap-4">
-                    <div className="flex items-center justify-between py-2 border-b border-ui-03">
-                      <span className="carbon-type-body-01 text-text-02">Cluster</span>
-                      <span className="carbon-type-body-01 text-text-01 font-medium">
-                        {selectedVulnerability.clusterName}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between py-2 border-b border-ui-03">
-                      <span className="carbon-type-body-01 text-text-02">Container</span>
-                      <span className="carbon-type-body-01 text-text-01 font-medium">
-                        {selectedVulnerability.containerName}
-                      </span>
-                    </div>
                     <div className="flex items-center justify-between py-2 border-b border-ui-03">
                       <span className="carbon-type-body-01 text-text-02">Image</span>
                       <span className="carbon-type-code-01 text-text-01 text-xs break-all">
                         {selectedVulnerability.image}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between py-2">
+                    <div className="flex items-center justify-between py-2 border-b border-ui-03">
                       <span className="carbon-type-body-01 text-text-02">Category</span>
                       <span className="carbon-type-body-01 text-text-01 font-medium">
                         {selectedVulnerability.category}
                       </span>
+                    </div>
+                    <div className="py-2">
+                      <span className="carbon-type-body-01 text-text-02 mb-2 block">
+                        Clusters ({selectedVulnerability.clusters.length})
+                      </span>
+                      <div className="space-y-2">
+                        {selectedVulnerability.clusters.map((cluster, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between p-3 bg-layer-02 border border-ui-03 rounded"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="flex h-6 w-6 items-center justify-center rounded bg-interactive-01">
+                                <Server className="h-3 w-3 text-white" />
+                              </div>
+                              <div>
+                                <span className="carbon-type-body-01 text-text-01 font-medium">
+                                  {cluster.clusterName}
+                                </span>
+                                <div className="carbon-type-label-01 text-text-02">
+                                  Container: {cluster.containerName}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
