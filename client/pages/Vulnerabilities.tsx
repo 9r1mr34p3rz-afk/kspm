@@ -87,30 +87,50 @@ export default function Vulnerabilities() {
     fetchVulnerabilityData();
   }, []);
 
-  // Calculate metrics
-  const getAllVulnerabilities = (): Array<Vulnerability & { clusterName: string; containerName: string; image: string }> => {
+  // Calculate metrics - deduplicate vulnerabilities and group by clusters
+  const getAllVulnerabilities = (): Array<Vulnerability & { clusters: Array<{clusterName: string; containerName: string}>, image: string }> => {
     if (!vulnerabilityData) return [];
 
-    const allVulns: Array<Vulnerability & { clusterName: string; containerName: string; image: string }> = [];
-    
+    const vulnMap = new Map<string, Vulnerability & { clusters: Array<{clusterName: string; containerName: string}>, image: string }>();
+
     vulnerabilityData.clusterStatuses.forEach(cluster => {
       cluster.nodes.forEach(node => {
         node.containerImages.forEach(container => {
           if (container.vulnerabilities) {
             container.vulnerabilities.forEach(vuln => {
-              allVulns.push({
-                ...vuln,
-                clusterName: cluster.name,
-                containerName: container.name,
-                image: container.image
-              });
+              // Create a unique key for each vulnerability based on CVE + image
+              const key = `${vuln.cve}-${container.image}`;
+
+              if (vulnMap.has(key)) {
+                // Add cluster info to existing vulnerability
+                const existing = vulnMap.get(key)!;
+                const clusterExists = existing.clusters.some(c =>
+                  c.clusterName === cluster.name && c.containerName === container.name
+                );
+                if (!clusterExists) {
+                  existing.clusters.push({
+                    clusterName: cluster.name,
+                    containerName: container.name
+                  });
+                }
+              } else {
+                // Create new vulnerability entry
+                vulnMap.set(key, {
+                  ...vuln,
+                  clusters: [{
+                    clusterName: cluster.name,
+                    containerName: container.name
+                  }],
+                  image: container.image
+                });
+              }
             });
           }
         });
       });
     });
 
-    return allVulns;
+    return Array.from(vulnMap.values());
   };
 
   const allVulnerabilities = getAllVulnerabilities();
