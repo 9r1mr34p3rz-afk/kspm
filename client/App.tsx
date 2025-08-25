@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ScanResults from "./pages/ScanResults";
 import KubeconfigManagement from "./pages/KubeconfigManagement";
+import ClusterDetails from "./pages/ClusterDetails";
 import DockerImages from "./pages/DockerImages";
 import { PlaceholderPage } from "./pages/PlaceholderPage";
 
