@@ -3,24 +3,20 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { KubeconfigUpload } from "@/components/ui/kubeconfig-upload";
 import { KubeconfigTable } from "@/components/ui/kubeconfig-table";
 import { MetricCard } from "@/components/ui/metric-card";
-import { ClusterStatusCard } from "@/components/ui/cluster-status-card";
 import {
   Container,
   CheckCircle,
   AlertTriangle,
   Settings,
-  RefreshCw,
   Upload,
-  Server
+  Eye,
+  FileText
 } from "lucide-react";
 import { KubeconfigValidationResponse, KubeconfigEntry } from "@shared/kubeconfig";
-import { ClusterStatusResponse, ClusterStatus } from "@shared/cluster-status";
+import { Link } from "react-router-dom";
 
 export default function KubeconfigManagement() {
   const [kubeconfigs, setKubeconfigs] = useState<KubeconfigEntry[]>([]);
-  const [clusterStatuses, setClusterStatuses] = useState<ClusterStatus[]>([]);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isLoadingStatuses, setIsLoadingStatuses] = useState(false);
 
   // Load kubeconfigs from localStorage on component mount
   useEffect(() => {
@@ -29,8 +25,6 @@ export default function KubeconfigManagement() {
       try {
         const configs = JSON.parse(storedKubeconfigs);
         setKubeconfigs(configs);
-        // Fetch cluster statuses for valid configs
-        fetchClusterStatuses(configs.filter(k => k.status === 'valid'));
       } catch (error) {
         console.error('Error parsing stored kubeconfigs:', error);
       }
@@ -42,36 +36,6 @@ export default function KubeconfigManagement() {
     localStorage.setItem('kubeconfigs', JSON.stringify(kubeconfigs));
   }, [kubeconfigs]);
 
-  // Fetch cluster statuses for all valid kubeconfigs
-  const fetchClusterStatuses = async (validConfigs: KubeconfigEntry[]) => {
-    if (validConfigs.length === 0) {
-      setClusterStatuses([]);
-      return;
-    }
-
-    setIsLoadingStatuses(true);
-    const statuses: ClusterStatus[] = [];
-
-    try {
-      for (const config of validConfigs) {
-        try {
-          const response = await fetch(`http://localhost:8080/api/v1/kubeconfigs/${config.name}/status`);
-          if (response.ok) {
-            const data: ClusterStatusResponse = await response.json();
-            if (data.valid && data.clusterStatuses) {
-              statuses.push(...data.clusterStatuses);
-            }
-          }
-        } catch (error) {
-          console.error(`Error fetching status for ${config.name}:`, error);
-        }
-      }
-      setClusterStatuses(statuses);
-    } finally {
-      setIsLoadingStatuses(false);
-    }
-  };
-
   const handleUploadSuccess = (response: KubeconfigValidationResponse) => {
     const newKubeconfig: KubeconfigEntry = {
       name: response.name,
@@ -79,68 +43,50 @@ export default function KubeconfigManagement() {
       status: response.valid ? 'valid' : 'invalid'
     };
 
-    setKubeconfigs(prev => {
-      const updated = [...prev, newKubeconfig];
-      // Fetch cluster statuses after adding new config
-      if (response.valid) {
-        fetchClusterStatuses(updated.filter(k => k.status === 'valid'));
-      }
-      return updated;
-    });
+    setKubeconfigs(prev => [...prev, newKubeconfig]);
   };
 
   const handleDelete = (name: string) => {
-    setKubeconfigs(prev => {
-      const updated = prev.filter(k => k.name !== name);
-      // Refresh cluster statuses after deletion
-      fetchClusterStatuses(updated.filter(k => k.status === 'valid'));
-      return updated;
-    });
+    setKubeconfigs(prev => prev.filter(k => k.name !== name));
   };
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      const validConfigs = kubeconfigs.filter(k => k.status === 'valid');
-      await fetchClusterStatuses(validConfigs);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
 
   // Calculate metrics
-  const totalClusters = clusterStatuses.length;
-  const reachableClusters = clusterStatuses.filter(c => c.reachable).length;
-  const totalNodes = clusterStatuses.reduce((sum, c) => sum + c.nodes.length, 0);
-  const totalImages = clusterStatuses.reduce((sum, c) =>
-    sum + c.nodes.reduce((nodeSum, n) => nodeSum + n.containerImages.length, 0), 0
-  );
+  const totalConfigs = kubeconfigs.length;
+  const validConfigs = kubeconfigs.filter(k => k.status === 'valid').length;
+  const invalidConfigs = kubeconfigs.filter(k => k.status === 'invalid').length;
+  const recentlyAdded = kubeconfigs.filter(k => {
+    const importDate = new Date(k.importDate);
+    const dayAgo = new Date();
+    dayAgo.setDate(dayAgo.getDate() - 1);
+    return importDate > dayAgo;
+  }).length;
 
   const metrics = [
     {
-      title: "Active Clusters",
-      value: totalClusters.toString(),
+      title: "Total Configs",
+      value: totalConfigs.toString(),
       change: "",
       changeType: "neutral" as const,
-      icon: Server
+      icon: FileText
     },
     {
-      title: "Reachable",
-      value: reachableClusters.toString(),
-      change: "",
+      title: "Valid Configs",
+      value: validConfigs.toString(),
+      change: validConfigs > 0 ? `${Math.round((validConfigs/totalConfigs)*100)}%` : "",
       changeType: "positive" as const,
       icon: CheckCircle
     },
     {
-      title: "Total Nodes",
-      value: totalNodes.toString(),
+      title: "Invalid Configs",
+      value: invalidConfigs.toString(),
       change: "",
-      changeType: "neutral" as const,
-      icon: Container
+      changeType: invalidConfigs > 0 ? "negative" as const : "neutral" as const,
+      icon: AlertTriangle
     },
     {
-      title: "Container Images",
-      value: totalImages.toString(),
+      title: "Added Today",
+      value: recentlyAdded.toString(),
       change: "",
       changeType: "neutral" as const,
       icon: Upload
@@ -161,14 +107,13 @@ export default function KubeconfigManagement() {
                 Upload, validate, and manage kubeconfig files for your Kubernetes clusters
               </p>
             </div>
-            <button
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="flex items-center space-x-2 px-4 py-2 border border-ui-04 text-text-01 rounded carbon-type-body-01 hover:bg-ui-01 transition-colors"
+            <Link
+              to="/clusters"
+              className="flex items-center space-x-2 px-4 py-2 bg-interactive-01 text-white rounded carbon-type-body-01 hover:bg-interactive-03 transition-colors"
             >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
-            </button>
+              <Eye className="h-4 w-4" />
+              <span>View Cluster Details</span>
+            </Link>
           </div>
         </div>
 
@@ -180,76 +125,67 @@ export default function KubeconfigManagement() {
         </div>
 
         {/* Content Grid */}
-        <div className="space-y-8">
-          {/* Upload and Management Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Upload Form */}
-            <div className="lg:col-span-1">
-              <KubeconfigUpload onUploadSuccess={handleUploadSuccess} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Upload Form */}
+          <div className="lg:col-span-1">
+            <KubeconfigUpload onUploadSuccess={handleUploadSuccess} />
 
-              {/* Quick Info */}
-              <div className="mt-6 bg-layer-01 border border-ui-03 rounded p-6">
-                <h3 className="carbon-type-productive-heading-02 text-text-01 mb-4">
-                  Quick Info
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <Settings className="h-4 w-4 text-interactive-01" />
-                    <span className="carbon-type-body-01 text-text-01">
-                      Supported formats: YAML, YML
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-support-02" />
-                    <span className="carbon-type-body-01 text-text-01">
-                      Automatic validation on upload
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Container className="h-4 w-4 text-interactive-01" />
-                    <span className="carbon-type-body-01 text-text-01">
-                      Secure file processing
-                    </span>
-                  </div>
+            {/* Quick Info */}
+            <div className="mt-6 bg-layer-01 border border-ui-03 rounded p-6">
+              <h3 className="carbon-type-productive-heading-02 text-text-01 mb-4">
+                Quick Info
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <Settings className="h-4 w-4 text-interactive-01" />
+                  <span className="carbon-type-body-01 text-text-01">
+                    Supported formats: YAML, YML
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4 text-support-02" />
+                  <span className="carbon-type-body-01 text-text-01">
+                    Automatic validation on upload
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Container className="h-4 w-4 text-interactive-01" />
+                  <span className="carbon-type-body-01 text-text-01">
+                    Secure file processing
+                  </span>
                 </div>
               </div>
-            </div>
 
-            {/* Kubeconfigs Table */}
-            <div className="lg:col-span-2">
-              <KubeconfigTable
-                kubeconfigs={kubeconfigs}
-                onDelete={handleDelete}
-              />
+              {/* Next Steps */}
+              {validConfigs > 0 && (
+                <div className="mt-6 pt-6 border-t border-ui-03">
+                  <h4 className="carbon-type-productive-heading-01 text-text-01 mb-3">
+                    Next Steps
+                  </h4>
+                  <Link
+                    to="/clusters"
+                    className="w-full flex items-center space-x-2 p-3 bg-interactive-01 text-white rounded carbon-type-body-01 hover:bg-interactive-03 transition-colors"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>View Cluster Details</span>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Cluster Status Section */}
-          {clusterStatuses.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="carbon-type-productive-heading-03 text-text-01">
-                  Cluster Status ({clusterStatuses.length})
-                </h2>
-                {isLoadingStatuses && (
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-spin h-4 w-4 border-2 border-interactive-01 border-t-transparent rounded-full" />
-                    <span className="carbon-type-body-01 text-text-02">Loading cluster data...</span>
-                  </div>
-                )}
-              </div>
-              <div className="space-y-6">
-                {clusterStatuses.map((clusterStatus, index) => (
-                  <ClusterStatusCard key={index} clusterStatus={clusterStatus} />
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Kubeconfigs Table */}
+          <div className="lg:col-span-2">
+            <KubeconfigTable
+              kubeconfigs={kubeconfigs}
+              onDelete={handleDelete}
+            />
+          </div>
         </div>
 
         {/* Additional Information */}
         {kubeconfigs.length > 0 && (
-          <div className="bg-layer-01 border border-ui-03 rounded p-6">
+          <div className="mt-8 bg-layer-01 border border-ui-03 rounded p-6">
             <h3 className="carbon-type-productive-heading-02 text-text-01 mb-4">
               Management Tips
             </h3>
@@ -262,7 +198,7 @@ export default function KubeconfigManagement() {
                   <li>• Use descriptive cluster names for easy identification</li>
                   <li>• Regularly rotate and update kubeconfig credentials</li>
                   <li>• Remove unused cluster configurations</li>
-                  <li>• Monitor cluster reachability and permissions</li>
+                  <li>• Monitor cluster health through the details page</li>
                 </ul>
               </div>
               <div>
@@ -272,7 +208,7 @@ export default function KubeconfigManagement() {
                 <ul className="space-y-2 carbon-type-body-01 text-text-02">
                   <li>• Kubeconfig files contain sensitive credentials</li>
                   <li>• Validation ensures proper cluster connectivity</li>
-                  <li>• Check permissions regularly for security compliance</li>
+                  <li>• Check cluster details for permission status</li>
                   <li>• Delete configurations when access is no longer needed</li>
                 </ul>
               </div>
