@@ -25,15 +25,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/scan/:scanId" element={<ScanResults />} />
           <Route path="/kubernetes" element={<KubeconfigManagement />} />
-          <Route
-            path="/docker"
-            element={
-              <PlaceholderPage
-                title="Docker Image Security"
-                description="Scan Docker images for vulnerabilities, malware, and compliance issues. View detailed reports and remediation guidance."
-              />
-            }
-          />
+          <Route path="/docker" element={<DockerImages />} />
           <Route
             path="/vulnerabilities"
             element={
