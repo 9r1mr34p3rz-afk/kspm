@@ -114,9 +114,26 @@ export default function Vulnerabilities() {
   };
 
   const allVulnerabilities = getAllVulnerabilities();
-  
+
+  // Sort vulnerabilities by severity (Critical > High > Medium > Low)
+  const getSeverityOrder = (severity: string): number => {
+    switch (severity) {
+      case "Critical": return 0;
+      case "High": return 1;
+      case "Medium": return 2;
+      case "Low": return 3;
+      default: return 4;
+    }
+  };
+
+  const sortedVulnerabilities = allVulnerabilities.sort((a, b) => {
+    const orderA = getSeverityOrder(a.severity);
+    const orderB = getSeverityOrder(b.severity);
+    return orderA - orderB;
+  });
+
   // Filter vulnerabilities
-  const filteredVulnerabilities = allVulnerabilities.filter(vuln => {
+  const filteredVulnerabilities = sortedVulnerabilities.filter(vuln => {
     const matchesSearch = 
       vuln.cve.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vuln.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
