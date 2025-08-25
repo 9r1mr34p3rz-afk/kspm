@@ -100,7 +100,9 @@ export function DataTable({ columns, data, className, onRowClick }: DataTablePro
                       column.className,
                     )}
                   >
-                    {column.key === "severity" ? (
+                    {column.render ? (
+                      column.render(row[column.key], row)
+                    ) : column.key === "severity" ? (
                       <div className="flex items-center space-x-2">
                         {getSeverityIcon(row[column.key])}
                         <span className={getSeverityBadge(row[column.key])}>
